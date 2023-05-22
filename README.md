@@ -1,6 +1,6 @@
 <h1 align="center">
   <img style="height: 100px; width: 100px;" src="https://github.com/daobrussels/citizenwallet/blob/main/assets/logo.png" alt="citizen wallet logo"/><br/>
-  Citizen Wallet
+  Gratitude App
 </h1>
 
 Receive and send citizen coins to pay at participating events.
