@@ -1,9 +1,7 @@
 import 'package:citizenwallet/router/shell.dart';
 import 'package:citizenwallet/screens/landing/screen.dart';
 import 'package:citizenwallet/screens/settings/screen.dart';
-import 'package:citizenwallet/screens/transaction/screen.dart';
 import 'package:citizenwallet/screens/vouchers/screen.dart';
-import 'package:citizenwallet/screens/wallet/screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -45,23 +43,23 @@ GoRouter createRouter(
                 ),
               ),
               routes: [
-                GoRoute(
-                  name: 'Transaction',
-                  path: 'transactions/:transactionId',
-                  parentNavigatorKey: rootNavigatorKey,
-                  builder: (context, state) {
-                    if (state.extra == null) {
-                      return const SizedBox();
-                    }
+                // GoRoute(
+                //   name: 'Transaction',
+                //   path: 'transactions/:transactionId',
+                //   parentNavigatorKey: rootNavigatorKey,
+                //   builder: (context, state) {
+                //     if (state.extra == null) {
+                //       return const SizedBox();
+                //     }
 
-                    final extra = state.extra as Map<String, dynamic>;
+                //     final extra = state.extra as Map<String, dynamic>;
 
-                    return TransactionScreen(
-                      transactionId: state.params['transactionId'],
-                      logic: extra['logic'],
-                    );
-                  },
-                ),
+                //     return TransactionScreen(
+                //       transactionId: state.params['transactionId'],
+                //       logic: extra['logic'],
+                //     );
+                //   },
+                // ),
               ],
             ),
             GoRoute(
