@@ -30,6 +30,9 @@ class ProfileIcon extends StatelessWidget {
             color: CupertinoColors.white,
             fontSize: size / 2,
             fontWeight: FontWeight.bold,
+            fontFamilyFallback: const [
+              'Noto Color Emoji',
+            ],
           ),
         ),
       ),

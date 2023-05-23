@@ -61,3 +61,7 @@ flutter:
     - assets/lottie/qr_scan_success.json
     - assets/lottie/piggie_bank.json
   uses-material-design: false
+  fonts:
+    - family: Noto Color Emoji
+      fonts:
+        - asset: assets/fonts/NotoColorEmoji-Regular.ttf
