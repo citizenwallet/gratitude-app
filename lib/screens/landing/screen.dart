@@ -75,9 +75,6 @@ class LandingScreenState extends State<LandingScreen>
         child: Flex(
           direction: Axis.vertical,
           children: [
-            Header(
-              title: widget.title,
-            ),
             Expanded(
               child: Stack(
                 alignment: Alignment.center,
@@ -88,7 +85,19 @@ class LandingScreenState extends State<LandingScreen>
                     children: [
                       const SizedBox(height: 20),
                       const Text(
-                        "What's your name?",
+                        "Welcome",
+                        style: TextStyle(
+                            fontSize: 32, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 5),
+                      const Text(
+                        "Create a profile to get started",
+                        style: TextStyle(
+                            fontSize: 24, fontWeight: FontWeight.normal),
+                      ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        "Name",
                         style: TextStyle(
                             fontSize: 24, fontWeight: FontWeight.bold),
                       ),
