@@ -1,11 +1,9 @@
 import 'package:citizenwallet/state/landing/state.dart';
+import 'package:citizenwallet/state/vouchers/logic.dart';
 import 'package:citizenwallet/state/vouchers/state.dart';
-import 'package:citizenwallet/theme/colors.dart';
 import 'package:citizenwallet/widgets/activity/list.dart';
-import 'package:citizenwallet/widgets/button.dart';
 import 'package:citizenwallet/widgets/header.dart';
 import 'package:citizenwallet/widgets/profile_icon/icon.dart';
-import 'package:citizenwallet/widgets/profile_icon/picker.dart';
 import 'package:citizenwallet/widgets/voucher/list.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
@@ -25,16 +23,25 @@ class VouchersScreenState extends State<VouchersScreen>
     with TickerProviderStateMixin {
   final FocusNode descriptionFocusNode = FocusNode();
 
+  late VouchersLogic _logic;
+
   @override
   void initState() {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // make initial requests here
+
+      _logic = VouchersLogic(context);
+
+      onLoad();
     });
   }
 
-  void onLoad() async {}
+  void onLoad() async {
+    _logic.fetchVouchers();
+    _logic.fetchActivities();
+  }
 
   void onNameSubmitted() async {
     descriptionFocusNode.requestFocus();
@@ -69,6 +76,11 @@ class VouchersScreenState extends State<VouchersScreen>
     final vouchers = context.select((VouchersState state) => state.vouchers);
     final activities =
         context.select((VouchersState state) => state.activities);
+
+    final vouchersLoading =
+        context.select((VouchersState state) => state.vouchersLoading);
+    final activitiesLoading =
+        context.select((VouchersState state) => state.activitiesLoading);
 
     return CupertinoPageScaffold(
       child: SafeArea(
@@ -135,11 +147,13 @@ class VouchersScreenState extends State<VouchersScreen>
                     SliverToBoxAdapter(
                       child: SizedBox(
                         height: 100,
-                        child: VoucherList(
-                          onPressed: onVoucherPressed,
-                          onCreate: onVoucherCreate,
-                          vouchers: vouchers,
-                        ),
+                        child: vouchersLoading
+                            ? const CupertinoActivityIndicator()
+                            : VoucherList(
+                                onPressed: onVoucherPressed,
+                                onCreate: onVoucherCreate,
+                                vouchers: vouchers,
+                              ),
                       ),
                     ),
                     const SliverToBoxAdapter(
@@ -162,10 +176,18 @@ class VouchersScreenState extends State<VouchersScreen>
                         height: 20,
                       ),
                     ),
-                    ActivityList(
-                      activities: activities,
-                      onPressed: onActivityPressed,
-                    ),
+                    if (activitiesLoading)
+                      const SliverToBoxAdapter(
+                        child: SizedBox(
+                          height: 100,
+                          child: CupertinoActivityIndicator(),
+                        ),
+                      ),
+                    if (!activitiesLoading)
+                      ActivityList(
+                        activities: activities,
+                        onPressed: onActivityPressed,
+                      ),
                     const SliverToBoxAdapter(
                       child: SizedBox(
                         height: 20,

@@ -29,40 +29,51 @@ class Activity {
 }
 
 class VouchersState with ChangeNotifier {
-  bool loading = false;
-  bool error = false;
+  bool vouchersLoading = false;
+  bool vouchersError = false;
 
-  List<Voucher> vouchers = [
-    const Voucher(
-      address: '0x123',
-      title: 'hello',
-      icon: '😧',
-      description: 'world',
-    ),
-    const Voucher(
-      address: '0x345',
-      title: 'gratitude',
-      icon: '😵',
-      description: 'so nice',
-    ),
-    const Voucher(
-      address: '0x567',
-      title: 'another',
-      icon: '😵',
-      description: 'wow, amazing',
-    ),
-  ];
+  List<Voucher> vouchers = [];
 
-  List<Activity> activities = [
-    const Activity(
-        address: '0x123', title: 'Xavier', icon: '😸', description: '...'),
-    const Activity(
-        address: '0x345', title: 'Leen', icon: '💀', description: '...'),
-    const Activity(
-        address: '0x456', title: 'Kevin', icon: '🎃', description: '...'),
-    const Activity(
-        address: '0x678', title: 'Jeanne', icon: '😵‍💫', description: '...'),
-    const Activity(
-        address: '0x789', title: '...', icon: '😸', description: '...'),
-  ];
+  bool activitiesLoading = false;
+  bool activitiesError = false;
+
+  List<Activity> activities = [];
+
+  void fetchVouchersReq() {
+    vouchersLoading = true;
+    vouchersError = false;
+    notifyListeners();
+  }
+
+  void fetchVouchersSuccess(List<Voucher> vouchers) {
+    this.vouchers = vouchers;
+    vouchersLoading = false;
+    vouchersError = false;
+    notifyListeners();
+  }
+
+  void fetchVouchersError() {
+    vouchersLoading = false;
+    vouchersError = true;
+    notifyListeners();
+  }
+
+  void fetchActivitiesReq() {
+    activitiesLoading = true;
+    activitiesError = false;
+    notifyListeners();
+  }
+
+  void fetchActivitiesSuccess(List<Activity> activities) {
+    this.activities = activities;
+    activitiesLoading = false;
+    activitiesError = false;
+    notifyListeners();
+  }
+
+  void fetchActivitiesError() {
+    activitiesLoading = false;
+    activitiesError = true;
+    notifyListeners();
+  }
 }

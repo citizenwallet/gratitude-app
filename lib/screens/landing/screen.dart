@@ -58,7 +58,11 @@ class LandingScreenState extends State<LandingScreen>
   }
 
   void onCreate() async {
-    GoRouter.of(context).go('/vouchers/0x0');
+    final navigator = GoRouter.of(context);
+
+    await _logic.createProfile();
+
+    navigator.go('/vouchers/0x0');
   }
 
   @override
@@ -67,6 +71,8 @@ class LandingScreenState extends State<LandingScreen>
     final description =
         context.select((LandingState state) => state.profile.description);
     final icon = context.select((LandingState state) => state.profile.icon);
+
+    final loading = context.select((LandingState state) => state.loading);
 
     final isValid = name.isNotEmpty && description.isNotEmpty;
 
@@ -173,7 +179,8 @@ class LandingScreenState extends State<LandingScreen>
                       const SizedBox(height: 10),
                       ProfileIconPicker(
                           initialValue: icon, onIconChanged: onIconChanged),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 30),
+                      if (loading) const CupertinoActivityIndicator()
                     ],
                   ),
                   Positioned(
@@ -183,7 +190,7 @@ class LandingScreenState extends State<LandingScreen>
                       children: [
                         Button(
                           text: 'Create profile',
-                          onPressed: isValid ? onCreate : null,
+                          onPressed: isValid && !loading ? onCreate : null,
                         ),
                       ],
                     ),
