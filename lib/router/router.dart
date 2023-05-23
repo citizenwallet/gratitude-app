@@ -12,8 +12,8 @@ GoRouter createRouter(
   List<NavigatorObserver> observers,
 ) =>
     GoRouter(
-      // initialLocation: '/',
-      initialLocation: '/vouchers/:address',
+      initialLocation: '/',
+      // initialLocation: '/vouchers/:address',
       debugLogDiagnostics: kDebugMode,
       navigatorKey: rootNavigatorKey,
       observers: observers,
