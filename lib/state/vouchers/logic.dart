@@ -68,4 +68,29 @@ class VouchersLogic {
       _state.fetchActivitiesError();
     }
   }
+
+  void updateVoucherTitle(String title) {
+    _state.updateNewVoucherTitle(title);
+  }
+
+  void updateVoucherDescription(String description) {
+    _state.updateNewVoucherDescription(description);
+  }
+
+  void updateNewVoucherIcon(String icon) {
+    _state.updateNewVoucherIcon(icon);
+  }
+
+  Future<void> createVoucher() async {
+    try {
+      _state.createVoucherReq();
+
+      // make api call here
+      await delay(const Duration(seconds: 1));
+
+      _state.createVoucherSuccess();
+    } catch (e) {
+      _state.createVoucherError();
+    }
+  }
 }

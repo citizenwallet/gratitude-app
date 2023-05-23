@@ -39,6 +39,13 @@ class VouchersState with ChangeNotifier {
 
   List<Activity> activities = [];
 
+  bool voucherCreationLoading = false;
+  bool voucherCreationError = false;
+
+  String newVoucherTitle = '';
+  String newVoucherDescription = '';
+  String newVoucherIcon = '🚴‍♂️';
+
   void fetchVouchersReq() {
     vouchersLoading = true;
     vouchersError = false;
@@ -74,6 +81,43 @@ class VouchersState with ChangeNotifier {
   void fetchActivitiesError() {
     activitiesLoading = false;
     activitiesError = true;
+    notifyListeners();
+  }
+
+  void updateNewVoucherTitle(String name) {
+    newVoucherTitle = name;
+    notifyListeners();
+  }
+
+  void updateNewVoucherDescription(String description) {
+    newVoucherDescription = description;
+    notifyListeners();
+  }
+
+  void updateNewVoucherIcon(String icon) {
+    newVoucherIcon = icon;
+    notifyListeners();
+  }
+
+  void createVoucherReq() {
+    voucherCreationLoading = true;
+    voucherCreationError = false;
+    notifyListeners();
+  }
+
+  void createVoucherSuccess() {
+    voucherCreationLoading = false;
+    voucherCreationError = false;
+
+    newVoucherTitle = '';
+    newVoucherDescription = '';
+    newVoucherIcon = '🚴‍♂️';
+    notifyListeners();
+  }
+
+  void createVoucherError() {
+    voucherCreationLoading = false;
+    voucherCreationError = true;
     notifyListeners();
   }
 }

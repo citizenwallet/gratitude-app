@@ -1,3 +1,4 @@
+import 'package:citizenwallet/screens/vouchers/create_voucher_modal.dart';
 import 'package:citizenwallet/state/landing/state.dart';
 import 'package:citizenwallet/state/vouchers/logic.dart';
 import 'package:citizenwallet/state/vouchers/state.dart';
@@ -60,7 +61,7 @@ class VouchersScreenState extends State<VouchersScreen>
   }
 
   void onVoucherCreate() async {
-    print('new voucher');
+    handleVoucherCreate();
   }
 
   void onActivityPressed(String addr) async {
@@ -68,6 +69,14 @@ class VouchersScreenState extends State<VouchersScreen>
   }
 
   void handleDisplayProfile(BuildContext context) async {}
+
+  void handleVoucherCreate() async {
+    await showCupertinoModalPopup(
+      context: context,
+      barrierDismissible: true,
+      builder: (modalContext) => CreateVoucherModal(address: 'o'),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

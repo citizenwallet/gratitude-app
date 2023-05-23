@@ -2,7 +2,6 @@ import 'package:citizenwallet/state/landing/logic.dart';
 import 'package:citizenwallet/state/landing/state.dart';
 import 'package:citizenwallet/theme/colors.dart';
 import 'package:citizenwallet/widgets/button.dart';
-import 'package:citizenwallet/widgets/header.dart';
 import 'package:citizenwallet/widgets/profile_icon/icon.dart';
 import 'package:citizenwallet/widgets/profile_icon/picker.dart';
 import 'package:flutter/cupertino.dart';
@@ -178,7 +177,10 @@ class LandingScreenState extends State<LandingScreen>
                       ),
                       const SizedBox(height: 10),
                       ProfileIconPicker(
-                          initialValue: icon, onIconChanged: onIconChanged),
+                        initialValue: icon,
+                        icons: animals,
+                        onIconChanged: onIconChanged,
+                      ),
                       const SizedBox(height: 30),
                       if (loading) const CupertinoActivityIndicator()
                     ],
