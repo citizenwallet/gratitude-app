@@ -1,12 +1,18 @@
+import 'package:citizenwallet/state/landing/state.dart';
+import 'package:citizenwallet/state/vouchers/state.dart';
 import 'package:citizenwallet/theme/colors.dart';
+import 'package:citizenwallet/widgets/activity/list.dart';
 import 'package:citizenwallet/widgets/button.dart';
 import 'package:citizenwallet/widgets/header.dart';
 import 'package:citizenwallet/widgets/profile_icon/icon.dart';
 import 'package:citizenwallet/widgets/profile_icon/picker.dart';
+import 'package:citizenwallet/widgets/voucher/list.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
 
 class VouchersScreen extends StatefulWidget {
-  final String title = 'Vouchers';
+  final String title = 'Regens Unite';
+  final String subtitle = 'Rooted locally, connected globally';
   final String address;
 
   const VouchersScreen({super.key, required this.address});
@@ -42,11 +48,27 @@ class VouchersScreenState extends State<VouchersScreen>
     print(icon);
   }
 
-  void onCreate() async {}
+  void onVoucherPressed(String addr) async {
+    print(addr);
+  }
+
+  void onVoucherCreate() async {
+    print('new voucher');
+  }
+
+  void onActivityPressed(String addr) async {
+    print(addr);
+  }
+
+  void handleDisplayProfile(BuildContext context) async {}
 
   @override
   Widget build(BuildContext context) {
-    final invalidAmount = false;
+    final icon = context.select((LandingState state) => state.profile.icon);
+
+    final vouchers = context.select((VouchersState state) => state.vouchers);
+    final activities =
+        context.select((VouchersState state) => state.activities);
 
     return CupertinoPageScaffold(
       child: SafeArea(
@@ -54,139 +76,103 @@ class VouchersScreenState extends State<VouchersScreen>
           direction: Axis.vertical,
           children: [
             Header(
-              title: widget.title,
-            ),
-            Expanded(
-              child: Stack(
-                alignment: Alignment.center,
+              transparent: true,
+              titleWidget: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ListView(
-                    scrollDirection: Axis.vertical,
-                    padding: const EdgeInsets.fromLTRB(30, 20, 30, 0),
-                    children: [
-                      const SizedBox(height: 20),
-                      const Text(
-                        "What's your name?",
-                        style: TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 10),
-                      CupertinoTextField(
-                        // controller: widget.logic.amountController,
-                        placeholder: 'Enter your name',
-                        decoration: invalidAmount
-                            ? BoxDecoration(
-                                color:
-                                    const CupertinoDynamicColor.withBrightness(
-                                  color: CupertinoColors.white,
-                                  darkColor: CupertinoColors.black,
-                                ),
-                                border: Border.all(
-                                  color: ThemeColors.danger,
-                                ),
-                                borderRadius: const BorderRadius.all(
-                                    Radius.circular(5.0)),
-                              )
-                            : BoxDecoration(
-                                color:
-                                    const CupertinoDynamicColor.withBrightness(
-                                  color: CupertinoColors.white,
-                                  darkColor: CupertinoColors.black,
-                                ),
-                                border: Border.all(
-                                  color:
-                                      ThemeColors.border.resolveFrom(context),
-                                ),
-                                borderRadius: const BorderRadius.all(
-                                    Radius.circular(5.0)),
-                              ),
-                        maxLines: 1,
-                        maxLength: 25,
-                        autocorrect: false,
-                        enableSuggestions: false,
-                        textInputAction: TextInputAction.next,
-                        onSubmitted: (_) {
-                          onNameSubmitted();
-                        },
-                      ),
-                      const SizedBox(height: 10),
-                      const Text(
-                        "Short description",
-                        style: TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 10),
-                      CupertinoTextField(
-                        // controller: widget.logic.amountController,
-                        placeholder: 'Describe yourself in a few words',
-                        decoration: invalidAmount
-                            ? BoxDecoration(
-                                color:
-                                    const CupertinoDynamicColor.withBrightness(
-                                  color: CupertinoColors.white,
-                                  darkColor: CupertinoColors.black,
-                                ),
-                                border: Border.all(
-                                  color: ThemeColors.danger,
-                                ),
-                                borderRadius: const BorderRadius.all(
-                                    Radius.circular(5.0)),
-                              )
-                            : BoxDecoration(
-                                color:
-                                    const CupertinoDynamicColor.withBrightness(
-                                  color: CupertinoColors.white,
-                                  darkColor: CupertinoColors.black,
-                                ),
-                                border: Border.all(
-                                  color:
-                                      ThemeColors.border.resolveFrom(context),
-                                ),
-                                borderRadius: const BorderRadius.all(
-                                    Radius.circular(5.0)),
-                              ),
-                        maxLines: 1,
-                        maxLength: 25,
-                        autocorrect: true,
-                        enableSuggestions: false,
-                        textInputAction: TextInputAction.next,
-                        onSubmitted: (_) {
-                          onDescriptionSubmitted();
-                        },
-                      ),
-                      const SizedBox(height: 30),
-                      const Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Pick a profile icon",
-                            style: TextStyle(
-                                fontSize: 24, fontWeight: FontWeight.bold),
-                          ),
-                          ProfileIcon(
-                            '👨‍🚀',
-                            size: 80,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      ProfileIconPicker(onIconChanged: onIconChanged),
-                      const SizedBox(height: 20),
-                    ],
-                  ),
-                  Positioned(
-                    bottom: 20,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Button(
-                          text: 'Create profile',
-                          onPressed: onCreate,
-                        ),
-                      ],
+                  const SizedBox(height: 5),
+                  Text(
+                    widget.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
+                  const SizedBox(height: 5),
+                  Text(
+                    widget.subtitle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
                 ],
+              ),
+              actionButton: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  CupertinoButton(
+                      padding: const EdgeInsets.all(5),
+                      onPressed: () => handleDisplayProfile(context),
+                      child: ProfileIcon(
+                        icon,
+                        size: 40,
+                      )),
+                ],
+              ),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(15, 10, 15, 0),
+                child: CustomScrollView(
+                  slivers: [
+                    const SliverToBoxAdapter(
+                      child: SizedBox(
+                        height: 40,
+                        child: Text(
+                          "Vouchers",
+                          style: TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                    SliverToBoxAdapter(
+                      child: SizedBox(
+                        height: 100,
+                        child: VoucherList(
+                          onPressed: onVoucherPressed,
+                          onCreate: onVoucherCreate,
+                          vouchers: vouchers,
+                        ),
+                      ),
+                    ),
+                    const SliverToBoxAdapter(
+                      child: SizedBox(
+                        height: 20,
+                      ),
+                    ),
+                    const SliverToBoxAdapter(
+                      child: SizedBox(
+                        height: 40,
+                        child: Text(
+                          "Activity",
+                          style: TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                    const SliverToBoxAdapter(
+                      child: SizedBox(
+                        height: 20,
+                      ),
+                    ),
+                    ActivityList(
+                      activities: activities,
+                      onPressed: onActivityPressed,
+                    ),
+                    const SliverToBoxAdapter(
+                      child: SizedBox(
+                        height: 20,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

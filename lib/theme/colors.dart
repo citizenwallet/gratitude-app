@@ -52,13 +52,13 @@ class ThemeColors {
   );
 
   static const surfaceText = CupertinoDynamicColor.withBrightness(
-    color: CupertinoColors.white,
+    color: Color.fromRGBO(50, 50, 50, 1),
     darkColor: CupertinoColors.black,
   );
 
   static const surfaceSubtle = CupertinoDynamicColor.withBrightness(
-    color: Color.fromRGBO(255, 255, 255, 0.5),
-    darkColor: Color.fromRGBO(50, 50, 50, 0.5),
+    color: Color.fromRGBO(210, 210, 210, 1),
+    darkColor: Color.fromRGBO(50, 50, 50, 1),
   );
 
   static const surfaceBackground = CupertinoDynamicColor.withBrightness(
