@@ -31,7 +31,8 @@ class ProfileIcon extends StatelessWidget {
             fontSize: size / 2,
             fontWeight: FontWeight.bold,
             fontFamilyFallback: const [
-              'Noto Color Emoji',
+              'Apple Color Emoji',
+              'Noto Color Emoji', // https://stackoverflow.com/a/75498043/7012894
             ],
           ),
         ),
