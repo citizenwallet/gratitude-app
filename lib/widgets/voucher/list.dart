@@ -30,6 +30,7 @@ class VoucherList extends StatelessWidget {
                     title: 'new voucher',
                     address: 'new',
                     icon: '👻',
+                    color: CupertinoColors.systemGrey4,
                     onPressed: (_) => onCreate());
               },
             ),
