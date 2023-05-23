@@ -57,7 +57,7 @@ class ThemeColors {
   );
 
   static const surfaceSubtle = CupertinoDynamicColor.withBrightness(
-    color: Color.fromRGBO(210, 210, 210, 1),
+    color: Color.fromRGBO(225, 225, 225, 1),
     darkColor: Color.fromRGBO(50, 50, 50, 1),
   );
 
