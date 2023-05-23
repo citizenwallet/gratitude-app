@@ -38,9 +38,7 @@ class MyAppState extends State<MyApp> {
   final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
   MyAppState() {
-    router = kIsWeb
-        ? createWebRouter(_rootNavigatorKey, _shellNavigatorKey, [])
-        : createRouter(_rootNavigatorKey, _shellNavigatorKey, []);
+    router = createRouter(_rootNavigatorKey, _shellNavigatorKey, []);
   }
 
   @override

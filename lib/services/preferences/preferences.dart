@@ -21,7 +21,7 @@ class PreferencesService {
   bool get darkMode =>
       _preferences.getBool('darkMode') ??
       SchedulerBinding.instance.platformDispatcher.platformBrightness ==
-          Brightness.dark;
+          Brightness.light;
 
   Future setFirstLaunch(bool firstLaunch) async {
     await _preferences.setBool('firstLaunch', firstLaunch);

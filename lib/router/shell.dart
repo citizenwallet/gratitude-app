@@ -15,10 +15,10 @@ class RouterShell extends StatelessWidget {
 
   final List<BottomNavigationBarItem> items = [
     const BottomNavigationBarItem(
-      label: 'Wallets',
-      icon: Icon(CupertinoIcons.rectangle_on_rectangle_angled),
+      label: 'Vouchers',
+      icon: Icon(CupertinoIcons.hexagon),
       activeIcon: Icon(
-        CupertinoIcons.rectangle_on_rectangle_angled,
+        CupertinoIcons.hexagon_fill,
       ),
     ),
     const BottomNavigationBarItem(
@@ -29,7 +29,7 @@ class RouterShell extends StatelessWidget {
   ];
 
   final routes = {
-    '/wallet': 0,
+    '/vouchers': 0,
     '/settings': 1,
   };
 
@@ -52,7 +52,7 @@ class RouterShell extends StatelessWidget {
               onTap: (index) {
                 switch (index) {
                   case 0:
-                    GoRouter.of(context).go('/wallet/last');
+                    GoRouter.of(context).go('/vouchers/last');
                     break;
                   case 1:
                     GoRouter.of(context).go('/settings');

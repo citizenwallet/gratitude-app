@@ -4,18 +4,18 @@ import 'package:citizenwallet/widgets/header.dart';
 import 'package:citizenwallet/widgets/profile_icon/icon.dart';
 import 'package:citizenwallet/widgets/profile_icon/picker.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:go_router/go_router.dart';
 
-class LandingScreen extends StatefulWidget {
-  final String title = 'Regens Unite';
+class VouchersScreen extends StatefulWidget {
+  final String title = 'Vouchers';
+  final String address;
 
-  const LandingScreen({super.key});
+  const VouchersScreen({super.key, required this.address});
 
   @override
-  LandingScreenState createState() => LandingScreenState();
+  VouchersScreenState createState() => VouchersScreenState();
 }
 
-class LandingScreenState extends State<LandingScreen>
+class VouchersScreenState extends State<VouchersScreen>
     with TickerProviderStateMixin {
   final FocusNode descriptionFocusNode = FocusNode();
 
@@ -42,9 +42,7 @@ class LandingScreenState extends State<LandingScreen>
     print(icon);
   }
 
-  void onCreate() async {
-    GoRouter.of(context).go('/vouchers/0x0');
-  }
+  void onCreate() async {}
 
   @override
   Widget build(BuildContext context) {
