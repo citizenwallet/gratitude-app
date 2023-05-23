@@ -1,4 +1,5 @@
 import 'package:citizenwallet/screens/vouchers/create_voucher_modal.dart';
+import 'package:citizenwallet/screens/vouchers/profile_modal.dart';
 import 'package:citizenwallet/state/landing/state.dart';
 import 'package:citizenwallet/state/vouchers/logic.dart';
 import 'package:citizenwallet/state/vouchers/state.dart';
@@ -68,7 +69,19 @@ class VouchersScreenState extends State<VouchersScreen>
     print(addr);
   }
 
-  void handleDisplayProfile(BuildContext context) async {}
+  void handleDisplayProfile(BuildContext context) async {
+    final profile = context.read<LandingState>().profile;
+
+    await showCupertinoModalPopup(
+      context: context,
+      barrierDismissible: true,
+      builder: (modalContext) => ProfileModal(
+        address: 'o',
+        title: profile.name,
+        subtitle: profile.description,
+      ),
+    );
+  }
 
   void handleVoucherCreate() async {
     await showCupertinoModalPopup(

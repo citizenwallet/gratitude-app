@@ -95,9 +95,9 @@ class CreateVoucherModalState extends State<CreateVoucherModal>
     final icon = context.select((VouchersState state) => state.newVoucherIcon);
 
     return DismissibleModalPopup(
-      modaleKey: 'receive-modal',
+      modaleKey: 'create-voucher-modal',
       maxHeight: height,
-      paddingSides: 10,
+      paddingSides: 0,
       onUpdate: (details) {
         if (details.direction == DismissDirection.down &&
             FocusManager.instance.primaryFocus?.hasFocus == true) {

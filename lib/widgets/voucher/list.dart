@@ -25,7 +25,6 @@ class VoucherList extends StatelessWidget {
             delegate: SliverChildBuilderDelegate(
               childCount: 1,
               (context, index) {
-                // return Text(voucher.title);
                 return VoucherCard(
                     title: 'new voucher',
                     address: 'new',
@@ -41,7 +40,6 @@ class VoucherList extends StatelessWidget {
               (context, index) {
                 final voucher = vouchers[index];
 
-                // return Text(voucher.title);
                 return VoucherCard(
                     key: Key(voucher.address),
                     title: voucher.title,
