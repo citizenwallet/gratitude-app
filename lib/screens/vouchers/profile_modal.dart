@@ -5,7 +5,7 @@ import 'package:citizenwallet/widgets/button.dart';
 import 'package:citizenwallet/widgets/chip.dart';
 import 'package:citizenwallet/widgets/dismissible_modal_popup.dart';
 import 'package:citizenwallet/widgets/header.dart';
-import 'package:citizenwallet/utils/web3.dart';
+import 'package:citizenwallet/services/wallet/utils.dart';
 import 'package:citizenwallet/widgets/profile_icon/icon.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
@@ -54,9 +54,7 @@ class ProfileModalState extends State<ProfileModal>
     await showCupertinoModalPopup(
       context: context,
       barrierDismissible: true,
-      builder: (modalContext) => const ProfileEditModal(
-        address: '0x123456789',
-      ),
+      builder: (modalContext) => const ProfileEditModal(),
     );
   }
 

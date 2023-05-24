@@ -1,3 +1,4 @@
+import 'package:citizenwallet/state/account/state.dart';
 import 'package:citizenwallet/state/app/state.dart';
 import 'package:citizenwallet/state/profile/state.dart';
 import 'package:citizenwallet/state/vouchers/state.dart';
@@ -14,6 +15,9 @@ Widget provideAppState(Widget child) => MultiProvider(
         ),
         ChangeNotifierProvider(
           create: (_) => VouchersState(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => AccountState(),
         ),
       ],
       child: child,

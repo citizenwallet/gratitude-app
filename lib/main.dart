@@ -1,9 +1,9 @@
 import 'package:citizenwallet/router/router.dart';
+import 'package:citizenwallet/services/encrypted_preferences/encrypted_preferences.dart';
 import 'package:citizenwallet/services/preferences/preferences.dart';
 import 'package:citizenwallet/state/app/state.dart';
 import 'package:citizenwallet/state/state.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -13,6 +13,7 @@ void main() async {
   await dotenv.load(fileName: '.env');
 
   await PreferencesService().init();
+  await EncryptedPreferencesService().init();
 
   runApp(provideAppState(const MyApp()));
 }

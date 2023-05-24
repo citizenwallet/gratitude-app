@@ -1,8 +1,11 @@
 import 'package:citizenwallet/screens/vouchers/create_voucher_modal.dart';
 import 'package:citizenwallet/screens/vouchers/profile_modal.dart';
+import 'package:citizenwallet/state/account/logic.dart';
+import 'package:citizenwallet/state/account/state.dart';
 import 'package:citizenwallet/state/profile/state.dart';
 import 'package:citizenwallet/state/vouchers/logic.dart';
 import 'package:citizenwallet/state/vouchers/state.dart';
+import 'package:citizenwallet/utils/delay.dart';
 import 'package:citizenwallet/widgets/activity/list.dart';
 import 'package:citizenwallet/widgets/header.dart';
 import 'package:citizenwallet/widgets/profile_icon/icon.dart';
@@ -25,21 +28,27 @@ class VouchersScreenState extends State<VouchersScreen>
   final FocusNode descriptionFocusNode = FocusNode();
 
   late VouchersLogic _logic;
+  late AccountLogic _accountLogic;
 
   @override
   void initState() {
     super.initState();
 
+    _logic = VouchersLogic(context);
+    _accountLogic = AccountLogic(context);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // make initial requests here
-
-      _logic = VouchersLogic(context);
 
       onLoad();
     });
   }
 
   void onLoad() async {
+    await delay(const Duration(seconds: 1));
+
+    await _accountLogic.loadWallet();
+
     _logic.fetchVouchers();
     _logic.fetchActivities();
   }
@@ -69,11 +78,13 @@ class VouchersScreenState extends State<VouchersScreen>
   }
 
   void handleDisplayProfile(BuildContext context) async {
+    final address = context.read<AccountState>().address;
+
     await showCupertinoModalPopup(
       context: context,
       barrierDismissible: true,
-      builder: (modalContext) => const ProfileModal(
-        address: '0x123456789',
+      builder: (modalContext) => ProfileModal(
+        address: address,
       ),
     );
   }
@@ -94,6 +105,8 @@ class VouchersScreenState extends State<VouchersScreen>
     final vouchers = context.select((VouchersState state) => state.vouchers);
     final activities =
         context.select((VouchersState state) => state.activities);
+
+    final loading = context.select((AccountState state) => state.loading);
 
     final vouchersLoading =
         context.select((VouchersState state) => state.vouchersLoading);
@@ -165,7 +178,7 @@ class VouchersScreenState extends State<VouchersScreen>
                     SliverToBoxAdapter(
                       child: SizedBox(
                         height: 100,
-                        child: vouchersLoading
+                        child: loading || vouchersLoading
                             ? const CupertinoActivityIndicator()
                             : VoucherList(
                                 onPressed: onVoucherPressed,
@@ -194,14 +207,14 @@ class VouchersScreenState extends State<VouchersScreen>
                         height: 20,
                       ),
                     ),
-                    if (activitiesLoading)
+                    if (loading || activitiesLoading)
                       const SliverToBoxAdapter(
                         child: SizedBox(
                           height: 100,
                           child: CupertinoActivityIndicator(),
                         ),
                       ),
-                    if (!activitiesLoading)
+                    if (!loading && !activitiesLoading)
                       ActivityList(
                         activities: activities,
                         onPressed: onActivityPressed,

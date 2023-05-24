@@ -7,14 +7,11 @@ import 'package:citizenwallet/widgets/header.dart';
 import 'package:citizenwallet/widgets/profile_icon/icon.dart';
 import 'package:citizenwallet/widgets/profile_icon/picker.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class ProfileEditModal extends StatefulWidget {
-  final String address;
-
-  const ProfileEditModal({super.key, required this.address});
+  const ProfileEditModal({super.key});
 
   @override
   ProfileEditModalState createState() => ProfileEditModalState();
@@ -73,12 +70,6 @@ class ProfileEditModalState extends State<ProfileEditModal>
     await _logic.setDefaultProfile();
 
     navigator.pop();
-  }
-
-  void handleCopy() {
-    Clipboard.setData(ClipboardData(text: widget.address));
-
-    HapticFeedback.lightImpact();
   }
 
   void handleSetProfile() async {

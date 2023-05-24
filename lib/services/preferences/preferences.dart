@@ -29,6 +29,18 @@ class PreferencesService {
 
   bool get onboarded => _preferences.getBool('onboarded') ?? false;
 
+  // the user's address
+  Future setAddress(String address) async {
+    await _preferences.setString('address', address);
+  }
+
+  String? get address => _preferences.getString('address');
+
+  // delete address
+  Future deleteAddress() async {
+    await _preferences.remove('address');
+  }
+
   Future setProfileName(String name) async {
     await _preferences.setString('profileName', name);
   }
