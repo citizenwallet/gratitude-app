@@ -45,7 +45,7 @@ class EncryptedPreferencesService {
     }
 
     await _preferences.write(
-        key: 'w_${address.toLowerCase()}', value: password);
+        key: '${passwordPrefix}_${address.toLowerCase()}', value: password);
   }
 
   // get wallet password
