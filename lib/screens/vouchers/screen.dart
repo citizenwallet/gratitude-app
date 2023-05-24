@@ -150,13 +150,16 @@ class VouchersScreenState extends State<VouchersScreen>
               actionButton: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  CupertinoButton(
-                      padding: const EdgeInsets.all(5),
-                      onPressed: () => handleDisplayProfile(context),
-                      child: ProfileIcon(
-                        icon,
-                        size: 40,
-                      )),
+                  loading
+                      ? const CupertinoActivityIndicator()
+                      : CupertinoButton(
+                          padding: const EdgeInsets.all(5),
+                          onPressed: () => handleDisplayProfile(context),
+                          child: ProfileIcon(
+                            icon,
+                            size: 40,
+                          ),
+                        ),
                 ],
               ),
             ),

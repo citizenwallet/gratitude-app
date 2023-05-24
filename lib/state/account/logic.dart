@@ -87,6 +87,8 @@ class AccountLogic {
 
       _wallet = loadedWallet;
 
+      _wallet.initUnlocked();
+
       _state.addressSuccess(address);
     } on ConfigErrorException {
       // something went wrong or storage was manually cleared
