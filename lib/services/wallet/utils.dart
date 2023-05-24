@@ -26,7 +26,7 @@ bool isZeroHexValue(String hex) {
 }
 
 String formatHexAddress(String address) {
-  if (isZeroHexValue(address)) {
+  if (isZeroHexValue(address) || address.length < 6) {
     return address;
   }
 
