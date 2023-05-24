@@ -61,13 +61,13 @@ class AccountLogic {
         // the user has been onboarded
         final savedPassword = await _ePrefs.getWalletPassword(address);
         if (savedPassword == null) {
-          throw ConfigErrorException;
+          throw ConfigErrorException();
         }
 
         // get wallet json
         final String? savedWallet = await _ePrefs.getWalletJson(address);
         if (savedWallet == null) {
-          throw ConfigErrorException;
+          throw ConfigErrorException();
         }
 
         // load wallet
@@ -82,7 +82,7 @@ class AccountLogic {
       final loadedWallet =
           await walletServiceFromCredentials(BigInt.parse(chainID), wallet);
       if (loadedWallet == null) {
-        throw ConfigErrorException;
+        throw ConfigErrorException();
       }
 
       _wallet = loadedWallet;
