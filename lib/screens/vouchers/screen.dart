@@ -69,15 +69,11 @@ class VouchersScreenState extends State<VouchersScreen>
   }
 
   void handleDisplayProfile(BuildContext context) async {
-    final profile = context.read<ProfileState>().profile;
-
     await showCupertinoModalPopup(
       context: context,
       barrierDismissible: true,
-      builder: (modalContext) => ProfileModal(
-        address: 'o',
-        title: profile.name,
-        subtitle: profile.description,
+      builder: (modalContext) => const ProfileModal(
+        address: '0x123456789',
       ),
     );
   }
@@ -86,7 +82,8 @@ class VouchersScreenState extends State<VouchersScreen>
     await showCupertinoModalPopup(
       context: context,
       barrierDismissible: true,
-      builder: (modalContext) => CreateVoucherModal(address: 'o'),
+      builder: (modalContext) =>
+          const CreateVoucherModal(address: '0x123456789'),
     );
   }
 

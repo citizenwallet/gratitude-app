@@ -1,28 +1,22 @@
-import 'package:citizenwallet/state/vouchers/logic.dart';
-import 'package:citizenwallet/state/vouchers/state.dart';
+import 'package:citizenwallet/screens/vouchers/profile_edit_modal.dart';
+import 'package:citizenwallet/state/profile/state.dart';
 import 'package:citizenwallet/theme/colors.dart';
 import 'package:citizenwallet/widgets/button.dart';
 import 'package:citizenwallet/widgets/chip.dart';
 import 'package:citizenwallet/widgets/dismissible_modal_popup.dart';
 import 'package:citizenwallet/widgets/header.dart';
+import 'package:citizenwallet/utils/web3.dart';
 import 'package:citizenwallet/widgets/profile_icon/icon.dart';
-import 'package:citizenwallet/widgets/profile_icon/picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
+import 'package:provider/provider.dart';
 
 class ProfileModal extends StatefulWidget {
-  final String title;
-  final String subtitle;
   final String address;
 
-  const ProfileModal(
-      {super.key,
-      required this.title,
-      required this.subtitle,
-      required this.address});
+  const ProfileModal({super.key, required this.address});
 
   @override
   ProfileModalState createState() => ProfileModalState();
@@ -55,6 +49,17 @@ class ProfileModalState extends State<ProfileModal>
     HapticFeedback.lightImpact();
   }
 
+  void handleProfileEdit(BuildContext context) async {
+    // open modal
+    await showCupertinoModalPopup(
+      context: context,
+      barrierDismissible: true,
+      builder: (modalContext) => const ProfileEditModal(
+        address: '0x123456789',
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
@@ -62,6 +67,11 @@ class ProfileModalState extends State<ProfileModal>
 
     final size = height > width ? width : height;
     final qrSize = size - 80;
+
+    final name = context.select((ProfileState state) => state.profile.name);
+    final description =
+        context.select((ProfileState state) => state.profile.description);
+    final icon = context.select((ProfileState state) => state.profile.icon);
 
     return DismissibleModalPopup(
       modaleKey: 'profile-modal',
@@ -84,31 +94,39 @@ class ProfileModalState extends State<ProfileModal>
               children: [
                 Header(
                   transparent: true,
-                  titleWidget: Column(
+                  titleWidget: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const SizedBox(height: 5),
-                      Text(
-                        widget.title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      ProfileIcon(icon, size: 40),
+                      const SizedBox(width: 10),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 5),
+                          Text(
+                            name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            description,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                        ],
                       ),
-                      const SizedBox(height: 5),
-                      Text(
-                        widget.subtitle,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.normal,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
                     ],
                   ),
                   actionButton: CupertinoButton(
@@ -128,20 +146,23 @@ class ProfileModalState extends State<ProfileModal>
                         scrollDirection: Axis.vertical,
                         padding: const EdgeInsets.fromLTRB(30, 20, 30, 0),
                         children: [
+                          const SizedBox(
+                            height: 10,
+                          ),
                           PrettyQr(
                             data: widget.address,
                             size: qrSize,
                             roundEdges: false,
                           ),
                           const SizedBox(
-                            height: 30,
+                            height: 50,
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Chip(
                                 onTap: handleCopy,
-                                widget.address,
+                                formatHexAddress(widget.address),
                                 color: ThemeColors.subtleEmphasis
                                     .resolveFrom(context),
                                 textColor:
@@ -154,6 +175,18 @@ class ProfileModalState extends State<ProfileModal>
                                 ),
                                 borderRadius: 15,
                                 maxWidth: 180,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 30,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Button(
+                                text: 'Edit profile',
+                                onPressed: () => handleProfileEdit(context),
                               ),
                             ],
                           ),

@@ -23,7 +23,13 @@ class ProfileLogic {
     _state.updateProfileIcon(icon);
   }
 
-  Future<void> createProfile() async {
+  Future<void> setDefaultProfile() async {
+    _state.updateProfileName(_preferences.profileName);
+    _state.updateProfileDescription(_preferences.profileDescription);
+    _state.updateProfileIcon(_preferences.profileIcon ?? '👩‍🚀');
+  }
+
+  Future<void> setProfile() async {
     try {
       _state.creatingReq();
 
@@ -35,11 +41,7 @@ class ProfileLogic {
       // the user has been onboarded
       await _preferences.setOnboarded(true);
 
-      _state.creatingSuccess(Profile(
-        name: _state.profile.name,
-        description: _state.profile.description,
-        icon: _state.profile.icon,
-      ));
+      _state.creatingSuccess();
     } catch (e) {
       _state.creatingError();
     }

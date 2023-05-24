@@ -56,10 +56,9 @@ class ProfileState with ChangeNotifier {
     notifyListeners();
   }
 
-  void creatingSuccess(Profile profile) {
+  void creatingSuccess() {
     loading = false;
     error = false;
-    this.profile = profile;
     notifyListeners();
   }
 

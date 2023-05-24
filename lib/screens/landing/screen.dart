@@ -27,10 +27,12 @@ class LandingScreenState extends State<LandingScreen>
   void initState() {
     super.initState();
 
+    _logic = ProfileLogic(context);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // make initial requests here
 
-      _logic = ProfileLogic(context);
+      onLoad();
     });
   }
 
@@ -56,10 +58,10 @@ class LandingScreenState extends State<LandingScreen>
     _logic.updateProfileIcon(icon);
   }
 
-  void onCreate() async {
+  void handleSetProfile() async {
     final navigator = GoRouter.of(context);
 
-    await _logic.createProfile();
+    await _logic.setProfile();
 
     navigator.go('/vouchers');
   }
@@ -192,7 +194,8 @@ class LandingScreenState extends State<LandingScreen>
                       children: [
                         Button(
                           text: 'Create profile',
-                          onPressed: isValid && !loading ? onCreate : null,
+                          onPressed:
+                              isValid && !loading ? handleSetProfile : null,
                         ),
                       ],
                     ),
