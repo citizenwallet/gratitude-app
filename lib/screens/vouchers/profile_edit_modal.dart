@@ -225,20 +225,21 @@ class ProfileEditModalState extends State<ProfileEditModal>
                             onIconChanged: onIconChanged,
                           ),
                           const SizedBox(height: 30),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Button(
-                                text: 'Edit profile',
-                                onPressed: isValid && !loading
-                                    ? handleSetProfile
-                                    : null,
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 30),
                           if (loading) const CupertinoActivityIndicator(),
                         ],
+                      ),
+                      Positioned(
+                        bottom: 20,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Button(
+                              text: 'Save changes',
+                              onPressed:
+                                  isValid && !loading ? handleSetProfile : null,
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),

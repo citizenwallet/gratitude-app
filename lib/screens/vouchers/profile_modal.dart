@@ -186,6 +186,16 @@ class ProfileModalState extends State<ProfileModal>
                             children: [
                               Button(
                                 text: 'Edit profile',
+                                suffix: const Row(
+                                  children: [
+                                    SizedBox(width: 5),
+                                    Icon(
+                                      CupertinoIcons.pencil,
+                                      size: 18,
+                                      color: CupertinoColors.white,
+                                    ),
+                                  ],
+                                ),
                                 onPressed: () => handleProfileEdit(context),
                               ),
                             ],

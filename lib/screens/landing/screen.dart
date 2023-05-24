@@ -194,6 +194,16 @@ class LandingScreenState extends State<LandingScreen>
                       children: [
                         Button(
                           text: 'Create profile',
+                          suffix: const Row(
+                            children: [
+                              SizedBox(width: 5),
+                              Icon(
+                                CupertinoIcons.plus,
+                                size: 18,
+                                color: CupertinoColors.white,
+                              ),
+                            ],
+                          ),
                           onPressed:
                               isValid && !loading ? handleSetProfile : null,
                         ),
