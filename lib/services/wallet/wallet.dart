@@ -138,7 +138,7 @@ class WalletService {
   final Client _client = Client();
 
   late Web3Client _ethClient;
-  StationService? _station;
+  // StationService? _station;
   late APIService _api;
 
   /// creates a new random private key
@@ -461,13 +461,13 @@ class WalletService {
   /// get station config
   Future<Chain?> configStation(String url, EthPrivateKey privatekey) async {
     try {
-      _station = StationService(
-        baseURL: url,
-        address: _address.hex,
-        requesterKey: privatekey,
-      );
+      // _station = StationService(
+      //   baseURL: url,
+      //   address: _address.hex,
+      //   requesterKey: privatekey,
+      // );
 
-      final response = await _station!.hello();
+      // final response = await _station!.hello();
 
       // await sendGasStationTransaction(
       //   to: '0xe13b2276bb63fde321719bbf6dca9a70fc40efcc',
@@ -475,7 +475,7 @@ class WalletService {
       //   message: 'hello gas station',
       // );
 
-      return response;
+      // return response;
     } catch (e) {
       // error fetching block
       print(e);
@@ -533,9 +533,9 @@ class WalletService {
       ),
     };
 
-    final response = await _station!.transaction(
-      jsonEncode(data),
-    );
+    // final response = await _station!.transaction(
+    //   jsonEncode(data),
+    // );
 
     return '';
   }
