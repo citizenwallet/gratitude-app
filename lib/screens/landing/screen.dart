@@ -1,5 +1,5 @@
-import 'package:citizenwallet/state/landing/logic.dart';
-import 'package:citizenwallet/state/landing/state.dart';
+import 'package:citizenwallet/state/profile/logic.dart';
+import 'package:citizenwallet/state/profile/state.dart';
 import 'package:citizenwallet/theme/colors.dart';
 import 'package:citizenwallet/widgets/button.dart';
 import 'package:citizenwallet/widgets/profile_icon/icon.dart';
@@ -21,7 +21,7 @@ class LandingScreenState extends State<LandingScreen>
     with TickerProviderStateMixin {
   final FocusNode descriptionFocusNode = FocusNode();
 
-  late LandingLogic _logic;
+  late ProfileLogic _logic;
 
   @override
   void initState() {
@@ -30,7 +30,7 @@ class LandingScreenState extends State<LandingScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // make initial requests here
 
-      _logic = LandingLogic(context);
+      _logic = ProfileLogic(context);
     });
   }
 
@@ -61,17 +61,17 @@ class LandingScreenState extends State<LandingScreen>
 
     await _logic.createProfile();
 
-    navigator.go('/vouchers/0x0');
+    navigator.go('/vouchers');
   }
 
   @override
   Widget build(BuildContext context) {
-    final name = context.select((LandingState state) => state.profile.name);
+    final name = context.select((ProfileState state) => state.profile.name);
     final description =
-        context.select((LandingState state) => state.profile.description);
-    final icon = context.select((LandingState state) => state.profile.icon);
+        context.select((ProfileState state) => state.profile.description);
+    final icon = context.select((ProfileState state) => state.profile.icon);
 
-    final loading = context.select((LandingState state) => state.loading);
+    final loading = context.select((ProfileState state) => state.loading);
 
     final isValid = name.isNotEmpty && description.isNotEmpty;
 

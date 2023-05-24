@@ -1,13 +1,14 @@
-import 'package:citizenwallet/state/landing/state.dart';
-import 'package:citizenwallet/utils/delay.dart';
+import 'package:citizenwallet/services/preferences/preferences.dart';
+import 'package:citizenwallet/state/profile/state.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 
-class LandingLogic {
-  late LandingState _state;
+class ProfileLogic {
+  final PreferencesService _preferences = PreferencesService();
+  late ProfileState _state;
 
-  LandingLogic(BuildContext context) {
-    _state = context.read<LandingState>();
+  ProfileLogic(BuildContext context) {
+    _state = context.read<ProfileState>();
   }
 
   void updateProfileName(String name) {
@@ -26,8 +27,13 @@ class LandingLogic {
     try {
       _state.creatingReq();
 
-      // make api call here
-      await delay(const Duration(seconds: 1));
+      // save to preferences
+      await _preferences.setProfileName(_state.profile.name);
+      await _preferences.setProfileDescription(_state.profile.description);
+      await _preferences.setProfileIcon(_state.profile.icon);
+
+      // the user has been onboarded
+      await _preferences.setOnboarded(true);
 
       _state.creatingSuccess(Profile(
         name: _state.profile.name,

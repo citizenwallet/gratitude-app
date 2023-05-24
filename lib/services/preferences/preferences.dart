@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PreferencesService {
@@ -23,23 +22,29 @@ class PreferencesService {
       SchedulerBinding.instance.platformDispatcher.platformBrightness ==
           Brightness.light;
 
-  Future setFirstLaunch(bool firstLaunch) async {
-    await _preferences.setBool('firstLaunch', firstLaunch);
+  // has the user been onboarded
+  Future setOnboarded(bool onboarded) async {
+    await _preferences.setBool('onboarded', onboarded);
   }
 
-  bool get firstLaunch => _preferences.getBool('firstLaunch') ?? true;
+  bool get onboarded => _preferences.getBool('onboarded') ?? false;
 
-  Future setChainId(int chainId) async {
-    await _preferences.setInt('chainId', chainId);
+  Future setProfileName(String name) async {
+    await _preferences.setString('profileName', name);
   }
 
-  int get chainId =>
-      _preferences.getInt('chainId') ??
-      int.parse(dotenv.get('DEFAULT_CHAIN_ID'));
+  String get profileName => _preferences.getString('profileName') ?? '';
 
-  Future setLastWallet(String address) async {
-    await _preferences.setString('lastWallet', address);
+  Future setProfileDescription(String description) async {
+    await _preferences.setString('profileDescription', description);
   }
 
-  String? get lastWallet => _preferences.getString('lastWallet');
+  String get profileDescription =>
+      _preferences.getString('profileDescription') ?? '';
+
+  Future setProfileIcon(String icon) async {
+    await _preferences.setString('profileIcon', icon);
+  }
+
+  String? get profileIcon => _preferences.getString('profileIcon');
 }

@@ -2,6 +2,7 @@ import 'package:citizenwallet/router/shell.dart';
 import 'package:citizenwallet/screens/landing/screen.dart';
 import 'package:citizenwallet/screens/settings/screen.dart';
 import 'package:citizenwallet/screens/vouchers/screen.dart';
+import 'package:citizenwallet/services/preferences/preferences.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -12,8 +13,7 @@ GoRouter createRouter(
   List<NavigatorObserver> observers,
 ) =>
     GoRouter(
-      initialLocation: '/',
-      // initialLocation: '/vouchers/:address',
+      initialLocation: PreferencesService().onboarded ? '/vouchers' : '/',
       debugLogDiagnostics: kDebugMode,
       navigatorKey: rootNavigatorKey,
       observers: observers,
@@ -33,14 +33,12 @@ GoRouter createRouter(
           routes: [
             GoRoute(
               name: 'Vouchers',
-              path: '/vouchers/:address',
+              path: '/vouchers',
               parentNavigatorKey: shellNavigatorKey,
               pageBuilder: (context, state) => NoTransitionPage(
                 key: state.pageKey,
                 name: state.name,
-                child: VouchersScreen(
-                  address: state.params['address'] ?? '0x0',
-                ),
+                child: const VouchersScreen(),
               ),
               routes: [
                 // GoRoute(

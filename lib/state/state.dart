@@ -1,5 +1,5 @@
 import 'package:citizenwallet/state/app/state.dart';
-import 'package:citizenwallet/state/landing/state.dart';
+import 'package:citizenwallet/state/profile/state.dart';
 import 'package:citizenwallet/state/vouchers/state.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
@@ -10,7 +10,7 @@ Widget provideAppState(Widget child) => MultiProvider(
           create: (_) => AppState(),
         ),
         ChangeNotifierProvider(
-          create: (_) => LandingState(),
+          create: (_) => ProfileState(),
         ),
         ChangeNotifierProvider(
           create: (_) => VouchersState(),

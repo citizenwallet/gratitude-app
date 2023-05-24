@@ -1,6 +1,6 @@
 import 'package:citizenwallet/screens/vouchers/create_voucher_modal.dart';
 import 'package:citizenwallet/screens/vouchers/profile_modal.dart';
-import 'package:citizenwallet/state/landing/state.dart';
+import 'package:citizenwallet/state/profile/state.dart';
 import 'package:citizenwallet/state/vouchers/logic.dart';
 import 'package:citizenwallet/state/vouchers/state.dart';
 import 'package:citizenwallet/widgets/activity/list.dart';
@@ -13,9 +13,8 @@ import 'package:provider/provider.dart';
 class VouchersScreen extends StatefulWidget {
   final String title = 'Regens Unite';
   final String subtitle = 'Rooted locally, connected globally';
-  final String address;
 
-  const VouchersScreen({super.key, required this.address});
+  const VouchersScreen({super.key});
 
   @override
   VouchersScreenState createState() => VouchersScreenState();
@@ -70,7 +69,7 @@ class VouchersScreenState extends State<VouchersScreen>
   }
 
   void handleDisplayProfile(BuildContext context) async {
-    final profile = context.read<LandingState>().profile;
+    final profile = context.read<ProfileState>().profile;
 
     await showCupertinoModalPopup(
       context: context,
@@ -93,7 +92,7 @@ class VouchersScreenState extends State<VouchersScreen>
 
   @override
   Widget build(BuildContext context) {
-    final icon = context.select((LandingState state) => state.profile.icon);
+    final icon = context.select((ProfileState state) => state.profile.icon);
 
     final vouchers = context.select((VouchersState state) => state.vouchers);
     final activities =

@@ -1,3 +1,4 @@
+import 'package:citizenwallet/services/preferences/preferences.dart';
 import 'package:flutter/cupertino.dart';
 
 class Profile {
@@ -28,7 +29,7 @@ class Profile {
       };
 }
 
-class LandingState with ChangeNotifier {
+class ProfileState with ChangeNotifier {
   bool loading = false;
   bool error = false;
 
@@ -37,6 +38,17 @@ class LandingState with ChangeNotifier {
     description: '',
     icon: '👩‍🚀',
   );
+
+  ProfileState() {
+    // load profile from preferences
+    final preferences = PreferencesService();
+
+    profile = Profile(
+      name: preferences.profileName,
+      description: preferences.profileDescription,
+      icon: preferences.profileIcon ?? '👩‍🚀',
+    );
+  }
 
   void creatingReq() {
     loading = true;
@@ -47,6 +59,7 @@ class LandingState with ChangeNotifier {
   void creatingSuccess(Profile profile) {
     loading = false;
     error = false;
+    this.profile = profile;
     notifyListeners();
   }
 
