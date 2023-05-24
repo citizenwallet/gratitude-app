@@ -1,3 +1,4 @@
+import 'package:citizenwallet/services/preferences/preferences.dart';
 import 'package:citizenwallet/state/profile/logic.dart';
 import 'package:citizenwallet/state/profile/state.dart';
 import 'package:citizenwallet/theme/colors.dart';
@@ -21,6 +22,7 @@ class LandingScreenState extends State<LandingScreen>
     with TickerProviderStateMixin {
   final FocusNode descriptionFocusNode = FocusNode();
 
+  final PreferencesService _prefs = PreferencesService();
   late ProfileLogic _logic;
 
   @override
@@ -36,7 +38,11 @@ class LandingScreenState extends State<LandingScreen>
     });
   }
 
-  void onLoad() async {}
+  void onLoad() async {
+    if (_prefs.onboarded) {
+      GoRouter.of(context).go('/vouchers');
+    }
+  }
 
   void onNameChanged(String name) async {
     _logic.updateProfileName(name);
