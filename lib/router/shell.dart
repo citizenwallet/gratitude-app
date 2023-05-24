@@ -1,6 +1,5 @@
 import 'package:citizenwallet/theme/colors.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 
 class RouterShell extends StatelessWidget {
@@ -51,7 +50,7 @@ class RouterShell extends StatelessWidget {
             onTap: (index) {
               switch (index) {
                 case 0:
-                  GoRouter.of(context).go('/vouchers/last');
+                  GoRouter.of(context).go('/vouchers');
                   break;
                 case 1:
                   GoRouter.of(context).go('/settings');
