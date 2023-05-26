@@ -14,7 +14,9 @@ GoRouter createRouter(
   List<NavigatorObserver> observers,
 ) =>
     GoRouter(
-      initialLocation: PreferencesService().onboarded ? '/vouchers' : '/',
+      // initialLocation: PreferencesService().onboarded ? '/vouchers' : '/',
+      initialLocation:
+          '/vouchers/0x8c0812caBAD91bfa2E675b8C6d9332fAA5a2f36C/10061',
       debugLogDiagnostics: kDebugMode,
       navigatorKey: rootNavigatorKey,
       observers: observers,

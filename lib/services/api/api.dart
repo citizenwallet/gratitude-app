@@ -20,7 +20,7 @@ class APIService {
     final response = await http.get(
       Uri.parse('$baseURL${url ?? ''}'),
       headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
+        // 'Content-Type': 'application/json; charset=UTF-8',
       },
     ).timeout(const Duration(seconds: netTimeoutSeconds));
 
