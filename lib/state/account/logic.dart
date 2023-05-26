@@ -22,7 +22,6 @@ class AccountLogic {
   final EncryptedPreferencesService _ePrefs = EncryptedPreferencesService();
 
   late AccountState _state;
-  late WalletService _wallet;
 
   AccountLogic(BuildContext context) {
     _state = context.read<AccountState>();
@@ -85,9 +84,9 @@ class AccountLogic {
         throw ConfigErrorException();
       }
 
-      _wallet = loadedWallet;
+      _state.wallet = loadedWallet;
 
-      _wallet.initUnlocked();
+      await _state.wallet.initUnlocked();
 
       _state.addressSuccess(address);
     } on ConfigErrorException {

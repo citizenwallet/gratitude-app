@@ -1,11 +1,9 @@
 import 'package:citizenwallet/screens/vouchers/create_voucher_modal.dart';
 import 'package:citizenwallet/screens/vouchers/profile_modal.dart';
-import 'package:citizenwallet/state/account/logic.dart';
 import 'package:citizenwallet/state/account/state.dart';
 import 'package:citizenwallet/state/profile/state.dart';
 import 'package:citizenwallet/state/vouchers/logic.dart';
 import 'package:citizenwallet/state/vouchers/state.dart';
-import 'package:citizenwallet/utils/delay.dart';
 import 'package:citizenwallet/widgets/activity/list.dart';
 import 'package:citizenwallet/widgets/header.dart';
 import 'package:citizenwallet/widgets/profile_icon/icon.dart';
@@ -28,14 +26,12 @@ class VouchersScreenState extends State<VouchersScreen>
   final FocusNode descriptionFocusNode = FocusNode();
 
   late VouchersLogic _logic;
-  late AccountLogic _accountLogic;
 
   @override
   void initState() {
     super.initState();
 
     _logic = VouchersLogic(context);
-    _accountLogic = AccountLogic(context);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // make initial requests here
@@ -45,10 +41,6 @@ class VouchersScreenState extends State<VouchersScreen>
   }
 
   void onLoad() async {
-    await delay(const Duration(seconds: 1));
-
-    await _accountLogic.loadWallet();
-
     _logic.fetchVouchers();
     _logic.fetchActivities();
   }

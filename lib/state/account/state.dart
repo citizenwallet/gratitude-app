@@ -1,10 +1,13 @@
+import 'package:citizenwallet/services/wallet/wallet.dart';
 import 'package:flutter/cupertino.dart';
 
 class AccountState with ChangeNotifier {
-  bool loading = false;
+  bool loading = true;
   bool error = false;
 
   String address = '';
+
+  late WalletService wallet;
 
   void addressReq() {
     loading = true;

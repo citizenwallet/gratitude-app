@@ -3,14 +3,18 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:citizenwallet/services/api/api.dart';
-import 'package:citizenwallet/services/station/station.dart';
 import 'package:citizenwallet/services/wallet/models/block.dart';
 import 'package:citizenwallet/services/wallet/models/chain.dart';
 import 'package:citizenwallet/services/wallet/models/json_rpc.dart';
 import 'package:citizenwallet/services/wallet/models/message.dart';
 import 'package:citizenwallet/services/wallet/models/signer.dart';
 import 'package:citizenwallet/services/wallet/models/transaction.dart';
+import 'package:citizenwallet/services/wallet/models/voucher.dart';
 import 'package:citizenwallet/services/wallet/utils.dart';
+import 'package:citizenwallet/services/wallet/vouchers.dart';
+import 'package:citizenwallet/utils/uint8.dart';
+import 'package:crypto/crypto.dart';
+import 'package:cryptography/cryptography.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart';
@@ -140,6 +144,9 @@ class WalletService {
   late Web3Client _ethClient;
   // StationService? _station;
   late APIService _api;
+  final APIService _ipfs = APIService(baseURL: dotenv.get('IPFS_URL'));
+
+  late Vouchers vouchers;
 
   /// creates a new random private key
   /// init before using
@@ -248,6 +255,12 @@ class WalletService {
     _chainId = await _ethClient.getChainId();
 
     final stationUrl = dotenv.get('DEFAULT_STATION_URL');
+
+    vouchers = await newVouchers(chainId, _ethClient);
+
+    // vouchers.getVoucher();
+
+    // _getAllVouchers();
     // await configStation(stationUrl, _credentials!);
   }
 
@@ -458,6 +471,23 @@ class WalletService {
     return null;
   }
 
+  /// return a block for a given blockNumber
+  Future<Voucher?> getVoucher(String addr, BigInt voucherId) async {
+    try {
+      final uri = await vouchers.getUri(addr, voucherId);
+
+      final response = await await _ipfs.get(url: uri);
+
+      return Voucher.fromJson(response);
+    } catch (e) {
+      // error fetching block
+      print(e);
+    }
+    ;
+
+    return null;
+  }
+
   /// get station config
   Future<Chain?> configStation(String url, EthPrivateKey privatekey) async {
     try {
@@ -631,6 +661,7 @@ class WalletService {
 
   /// dispose of resources
   void dispose() {
+    vouchers.dispose();
     _ethClient.dispose();
   }
 }
