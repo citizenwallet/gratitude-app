@@ -19,9 +19,7 @@ class ProfileEditModal extends StatefulWidget {
 
 class ProfileEditModalState extends State<ProfileEditModal>
     with TickerProviderStateMixin {
-  final FocusNode descriptionFocusNode = FocusNode();
   final TextEditingController nameController = TextEditingController();
-  final TextEditingController descriptionController = TextEditingController();
 
   late ProfileLogic _logic;
 
@@ -40,8 +38,6 @@ class ProfileEditModalState extends State<ProfileEditModal>
 
   void onLoad() async {
     nameController.text = context.read<ProfileState>().profile.name;
-    descriptionController.text =
-        context.read<ProfileState>().profile.description;
   }
 
   void onNameChanged(String name) async {
@@ -49,14 +45,6 @@ class ProfileEditModalState extends State<ProfileEditModal>
   }
 
   void onNameSubmitted() async {
-    descriptionFocusNode.requestFocus();
-  }
-
-  void onDescriptionChanged(String desc) async {
-    _logic.updateProfileDescription(desc);
-  }
-
-  void onDescriptionSubmitted() async {
     FocusManager.instance.primaryFocus?.unfocus();
   }
 
@@ -161,37 +149,6 @@ class ProfileEditModalState extends State<ProfileEditModal>
                             onChanged: onNameChanged,
                             onSubmitted: (_) {
                               onNameSubmitted();
-                            },
-                          ),
-                          const SizedBox(height: 10),
-                          const Text(
-                            "Short description",
-                            style: TextStyle(
-                                fontSize: 24, fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 10),
-                          CupertinoTextField(
-                            controller: descriptionController,
-                            placeholder: 'Describe yourself in a few words',
-                            decoration: BoxDecoration(
-                              color: const CupertinoDynamicColor.withBrightness(
-                                color: CupertinoColors.white,
-                                darkColor: CupertinoColors.black,
-                              ),
-                              border: Border.all(
-                                color: ThemeColors.border.resolveFrom(context),
-                              ),
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(5.0)),
-                            ),
-                            maxLines: 1,
-                            maxLength: 25,
-                            autocorrect: true,
-                            enableSuggestions: false,
-                            textInputAction: TextInputAction.next,
-                            onChanged: onDescriptionChanged,
-                            onSubmitted: (_) {
-                              onDescriptionSubmitted();
                             },
                           ),
                           const SizedBox(height: 30),

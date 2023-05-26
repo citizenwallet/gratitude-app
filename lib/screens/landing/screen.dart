@@ -20,8 +20,6 @@ class LandingScreen extends StatefulWidget {
 
 class LandingScreenState extends State<LandingScreen>
     with TickerProviderStateMixin {
-  final FocusNode descriptionFocusNode = FocusNode();
-
   final PreferencesService _prefs = PreferencesService();
   late ProfileLogic _logic;
 
@@ -49,14 +47,6 @@ class LandingScreenState extends State<LandingScreen>
   }
 
   void onNameSubmitted() async {
-    descriptionFocusNode.requestFocus();
-  }
-
-  void onDescriptionChanged(String desc) async {
-    _logic.updateProfileDescription(desc);
-  }
-
-  void onDescriptionSubmitted() async {
     FocusManager.instance.primaryFocus?.unfocus();
   }
 
@@ -75,13 +65,12 @@ class LandingScreenState extends State<LandingScreen>
   @override
   Widget build(BuildContext context) {
     final name = context.select((ProfileState state) => state.profile.name);
-    final description =
-        context.select((ProfileState state) => state.profile.description);
+
     final icon = context.select((ProfileState state) => state.profile.icon);
 
     final loading = context.select((ProfileState state) => state.loading);
 
-    final isValid = name.isNotEmpty && description.isNotEmpty;
+    final isValid = name.isNotEmpty;
 
     return CupertinoPageScaffold(
       child: SafeArea(
@@ -143,30 +132,6 @@ class LandingScreenState extends State<LandingScreen>
                         "Short description",
                         style: TextStyle(
                             fontSize: 24, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 10),
-                      CupertinoTextField(
-                        placeholder: 'Describe yourself in a few words',
-                        decoration: BoxDecoration(
-                          color: const CupertinoDynamicColor.withBrightness(
-                            color: CupertinoColors.white,
-                            darkColor: CupertinoColors.black,
-                          ),
-                          border: Border.all(
-                            color: ThemeColors.border.resolveFrom(context),
-                          ),
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(5.0)),
-                        ),
-                        maxLines: 1,
-                        maxLength: 25,
-                        autocorrect: true,
-                        enableSuggestions: false,
-                        textInputAction: TextInputAction.next,
-                        onChanged: onDescriptionChanged,
-                        onSubmitted: (_) {
-                          onDescriptionSubmitted();
-                        },
                       ),
                       const SizedBox(height: 30),
                       Row(

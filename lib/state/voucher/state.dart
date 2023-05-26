@@ -8,6 +8,12 @@ class VoucherState with ChangeNotifier {
   Voucher? voucher;
   bool isOwner = false;
 
+  bool voucherCreationLoading = false;
+  bool voucherCreationError = false;
+
+  String newVoucherTitle = '';
+  String newVoucherDescription = '';
+
   void addressReq() {
     loading = true;
     error = false;
@@ -29,6 +35,37 @@ class VoucherState with ChangeNotifier {
 
   void setIsOwner(bool isOwner) {
     this.isOwner = isOwner;
+    notifyListeners();
+  }
+
+  void updateNewVoucherTitle(String name) {
+    newVoucherTitle = name;
+    notifyListeners();
+  }
+
+  void updateNewVoucherDescription(String description) {
+    newVoucherDescription = description;
+    notifyListeners();
+  }
+
+  void createVoucherReq() {
+    voucherCreationLoading = true;
+    voucherCreationError = false;
+    notifyListeners();
+  }
+
+  void createVoucherSuccess() {
+    voucherCreationLoading = false;
+    voucherCreationError = false;
+
+    newVoucherTitle = '';
+    newVoucherDescription = '';
+    notifyListeners();
+  }
+
+  void createVoucherError() {
+    voucherCreationLoading = false;
+    voucherCreationError = true;
     notifyListeners();
   }
 }

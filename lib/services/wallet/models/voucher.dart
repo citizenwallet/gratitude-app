@@ -45,3 +45,35 @@ class Voucher {
     };
   }
 }
+
+class VoucherRequest {
+  final String name;
+  final String description;
+  final String minterName;
+  final int amount;
+
+  VoucherRequest({
+    required this.name,
+    required this.description,
+    required this.minterName,
+    required this.amount,
+  });
+
+  factory VoucherRequest.fromJson(Map<String, dynamic> json) {
+    return VoucherRequest(
+      name: json['name'],
+      description: json['description'],
+      minterName: json['minter_name'],
+      amount: json['amount'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'description': description,
+      'minter_name': minterName,
+      'amount': amount,
+    };
+  }
+}

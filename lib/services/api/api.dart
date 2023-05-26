@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-const netTimeoutSeconds = 10;
+const netTimeoutSeconds = 60;
 const streamTimeoutSeconds = 10;
 
 class UnauthorizedException implements Exception {
@@ -31,13 +31,19 @@ class APIService {
     return jsonDecode(response.body);
   }
 
-  Future<dynamic> post({String? url, required Object body}) async {
+  Future<dynamic> post(
+      {String? url, required Object body, Map<String, String>? headers}) async {
+    final mergedHeaders = <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    };
+    if (headers != null) {
+      mergedHeaders.addAll(headers);
+    }
+
     final response = await http
         .post(
           Uri.parse('$baseURL${url ?? ''}'),
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8',
-          },
+          headers: mergedHeaders,
           body: jsonEncode(body),
         )
         .timeout(const Duration(seconds: netTimeoutSeconds));
@@ -46,6 +52,6 @@ class APIService {
       throw Exception('error sending data');
     }
 
-    return jsonDecode(response.body);
+    return jsonDecode(response.body != '' ? response.body : '{}');
   }
 }

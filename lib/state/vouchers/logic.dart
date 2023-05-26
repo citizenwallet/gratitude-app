@@ -1,3 +1,4 @@
+import 'package:citizenwallet/services/wallet/models/voucher.dart';
 import 'package:citizenwallet/state/vouchers/state.dart';
 import 'package:citizenwallet/utils/delay.dart';
 import 'package:flutter/cupertino.dart';
@@ -10,6 +11,10 @@ class VouchersLogic {
     _state = context.read<VouchersState>();
   }
 
+  void addVoucher(Voucher voucher) {
+    _state.addVoucher(voucher);
+  }
+
   Future<void> fetchVouchers() async {
     try {
       _state.fetchVouchersReq();
@@ -17,26 +22,7 @@ class VouchersLogic {
       // make api call here
       await delay(const Duration(seconds: 1));
 
-      _state.fetchVouchersSuccess([
-        const Voucher(
-          address: '0x123',
-          title: 'hello',
-          icon: '😧',
-          description: 'world',
-        ),
-        const Voucher(
-          address: '0x345',
-          title: 'gratitude',
-          icon: '😵',
-          description: 'so nice',
-        ),
-        const Voucher(
-          address: '0x567',
-          title: 'another',
-          icon: '😵',
-          description: 'wow, amazing',
-        ),
-      ]);
+      _state.fetchVouchersSuccess([]);
     } catch (e) {
       _state.fetchVouchersError();
     }
@@ -66,31 +52,6 @@ class VouchersLogic {
       ]);
     } catch (e) {
       _state.fetchActivitiesError();
-    }
-  }
-
-  void updateVoucherTitle(String title) {
-    _state.updateNewVoucherTitle(title);
-  }
-
-  void updateVoucherDescription(String description) {
-    _state.updateNewVoucherDescription(description);
-  }
-
-  void updateNewVoucherIcon(String icon) {
-    _state.updateNewVoucherIcon(icon);
-  }
-
-  Future<void> createVoucher() async {
-    try {
-      _state.createVoucherReq();
-
-      // make api call here
-      await delay(const Duration(seconds: 1));
-
-      _state.createVoucherSuccess();
-    } catch (e) {
-      _state.createVoucherError();
     }
   }
 }

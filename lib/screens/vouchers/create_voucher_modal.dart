@@ -1,11 +1,12 @@
+import 'package:citizenwallet/state/account/state.dart';
+import 'package:citizenwallet/state/profile/state.dart';
+import 'package:citizenwallet/state/voucher/logic.dart';
+import 'package:citizenwallet/state/voucher/state.dart';
 import 'package:citizenwallet/state/vouchers/logic.dart';
-import 'package:citizenwallet/state/vouchers/state.dart';
 import 'package:citizenwallet/theme/colors.dart';
 import 'package:citizenwallet/widgets/button.dart';
 import 'package:citizenwallet/widgets/dismissible_modal_popup.dart';
 import 'package:citizenwallet/widgets/header.dart';
-import 'package:citizenwallet/widgets/profile_icon/icon.dart';
-import 'package:citizenwallet/widgets/profile_icon/picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -23,30 +24,37 @@ class CreateVoucherModal extends StatefulWidget {
 
 class CreateVoucherModalState extends State<CreateVoucherModal>
     with TickerProviderStateMixin {
+  final TextEditingController _nameController = TextEditingController();
+  final FocusNode titleFocusNode = FocusNode();
   final FocusNode descriptionFocusNode = FocusNode();
 
-  late VouchersLogic _logic;
+  late VoucherLogic _voucherLogic;
 
   @override
   void initState() {
     super.initState();
 
+    _voucherLogic = VoucherLogic(context);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // make initial requests here
-
-      _logic = VouchersLogic(context);
 
       onLoad();
     });
   }
 
   void onLoad() async {
-    _logic.fetchVouchers();
-    _logic.fetchActivities();
+    final name = context.read<ProfileState>().profile.name;
+
+    _nameController.text = name;
+  }
+
+  void onNameSubmitted() async {
+    titleFocusNode.requestFocus();
   }
 
   void onTitleChanged(String title) async {
-    _logic.updateVoucherTitle(title);
+    _voucherLogic.updateVoucherTitle(title);
   }
 
   void onTitleSubmitted() async {
@@ -54,23 +62,20 @@ class CreateVoucherModalState extends State<CreateVoucherModal>
   }
 
   void onDescriptionChanged(String desc) async {
-    _logic.updateVoucherDescription(desc);
+    _voucherLogic.updateVoucherDescription(desc);
   }
 
   void onDescriptionSubmitted() async {
     FocusManager.instance.primaryFocus?.unfocus();
   }
 
-  void handleIconChanged(String icon) async {
-    _logic.updateNewVoucherIcon(icon);
-  }
-
   void onCreate() async {
     final navigator = GoRouter.of(context);
 
-    await _logic.createVoucher();
+    final voucher =
+        await _voucherLogic.createVoucher(_nameController.value.text);
 
-    navigator.pop();
+    navigator.pop(voucher);
   }
 
   void handleDismiss(BuildContext context) {
@@ -82,17 +87,15 @@ class CreateVoucherModalState extends State<CreateVoucherModal>
     final height = MediaQuery.of(context).size.height;
 
     final newVoucherTitle =
-        context.select((VouchersState state) => state.newVoucherTitle);
+        context.select((VoucherState state) => state.newVoucherTitle);
     final newVoucherDescription =
-        context.select((VouchersState state) => state.newVoucherDescription);
+        context.select((VoucherState state) => state.newVoucherDescription);
 
     final isValid =
         newVoucherTitle.isNotEmpty && newVoucherDescription.isNotEmpty;
 
     final voucherCreationLoading =
-        context.select((VouchersState state) => state.voucherCreationLoading);
-
-    final icon = context.select((VouchersState state) => state.newVoucherIcon);
+        context.select((VoucherState state) => state.voucherCreationLoading);
 
     return DismissibleModalPopup(
       modaleKey: 'create-voucher-modal',
@@ -160,6 +163,36 @@ class CreateVoucherModalState extends State<CreateVoucherModal>
                         padding: const EdgeInsets.fromLTRB(30, 20, 30, 0),
                         children: [
                           const Text(
+                            "From",
+                            style: TextStyle(
+                                fontSize: 24, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 10),
+                          CupertinoTextField(
+                            controller: _nameController,
+                            placeholder: 'Xavier',
+                            decoration: BoxDecoration(
+                              color: const CupertinoDynamicColor.withBrightness(
+                                color: CupertinoColors.white,
+                                darkColor: CupertinoColors.black,
+                              ),
+                              border: Border.all(
+                                color: ThemeColors.border.resolveFrom(context),
+                              ),
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(5.0)),
+                            ),
+                            maxLines: 1,
+                            maxLength: 25,
+                            autocorrect: false,
+                            enableSuggestions: false,
+                            textInputAction: TextInputAction.next,
+                            onSubmitted: (_) {
+                              onNameSubmitted();
+                            },
+                          ),
+                          const SizedBox(height: 10),
+                          const Text(
                             "Title",
                             style: TextStyle(
                                 fontSize: 24, fontWeight: FontWeight.bold),
@@ -182,6 +215,7 @@ class CreateVoucherModalState extends State<CreateVoucherModal>
                             maxLength: 25,
                             autocorrect: false,
                             enableSuggestions: false,
+                            focusNode: titleFocusNode,
                             textInputAction: TextInputAction.next,
                             onChanged: onTitleChanged,
                             onSubmitted: (_) {
@@ -213,32 +247,12 @@ class CreateVoucherModalState extends State<CreateVoucherModal>
                             maxLength: 25,
                             autocorrect: true,
                             enableSuggestions: false,
+                            focusNode: descriptionFocusNode,
                             textInputAction: TextInputAction.next,
                             onChanged: onDescriptionChanged,
                             onSubmitted: (_) {
                               onDescriptionSubmitted();
                             },
-                          ),
-                          const SizedBox(height: 30),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                "Pick a profile icon",
-                                style: TextStyle(
-                                    fontSize: 24, fontWeight: FontWeight.bold),
-                              ),
-                              ProfileIcon(
-                                icon,
-                                size: 80,
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          ProfileIconPicker(
-                            initialValue: icon,
-                            icons: things,
-                            onIconChanged: handleIconChanged,
                           ),
                           const SizedBox(height: 30),
                           if (voucherCreationLoading)

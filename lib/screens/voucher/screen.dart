@@ -5,6 +5,7 @@ import 'package:citizenwallet/state/voucher/state.dart';
 import 'package:citizenwallet/theme/colors.dart';
 import 'package:citizenwallet/widgets/button.dart';
 import 'package:citizenwallet/widgets/chip.dart';
+import 'package:citizenwallet/widgets/header.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -12,7 +13,7 @@ import 'package:provider/provider.dart';
 import 'package:transparent_image/transparent_image.dart';
 
 class VoucherScreen extends StatefulWidget {
-  final String title = 'Regens Unite';
+  final String title = 'Regen Treasury';
   final String contractId;
   final String voucherId;
 
@@ -110,6 +111,11 @@ class VoucherScreenState extends State<VoucherScreen>
         child: Flex(
           direction: Axis.vertical,
           children: [
+            Header(
+              title: widget.title,
+              showBackButton: true,
+              transparent: true,
+            ),
             SizedBox(
               height: imageSize / 2,
               width: imageSize,

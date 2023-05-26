@@ -1,5 +1,6 @@
 import 'package:citizenwallet/screens/vouchers/create_voucher_modal.dart';
 import 'package:citizenwallet/screens/vouchers/profile_modal.dart';
+import 'package:citizenwallet/services/wallet/models/voucher.dart';
 import 'package:citizenwallet/state/account/state.dart';
 import 'package:citizenwallet/state/profile/state.dart';
 import 'package:citizenwallet/state/vouchers/logic.dart';
@@ -82,12 +83,18 @@ class VouchersScreenState extends State<VouchersScreen>
   }
 
   void handleVoucherCreate() async {
-    await showCupertinoModalPopup(
+    final voucher = await showCupertinoModalPopup<Voucher?>(
       context: context,
       barrierDismissible: true,
       builder: (modalContext) =>
           const CreateVoucherModal(address: '0x123456789'),
     );
+
+    if (voucher == null) {
+      return;
+    }
+
+    _logic.addVoucher(voucher);
   }
 
   @override

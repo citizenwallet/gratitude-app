@@ -1,5 +1,7 @@
+import 'package:citizenwallet/services/wallet/models/voucher.dart';
 import 'package:citizenwallet/state/account/state.dart';
 import 'package:citizenwallet/state/voucher/state.dart';
+import 'package:citizenwallet/utils/delay.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
@@ -48,5 +50,34 @@ class VoucherLogic {
     } catch (e) {
       print(e);
     }
+  }
+
+  void updateVoucherTitle(String title) {
+    _state.updateNewVoucherTitle(title);
+  }
+
+  void updateVoucherDescription(String description) {
+    _state.updateNewVoucherDescription(description);
+  }
+
+  Future<Voucher?> createVoucher(String minterName) async {
+    try {
+      _state.createVoucherReq();
+
+      // make api call here
+      final voucher = await _accState.wallet.createVoucher(
+        minterName,
+        _state.newVoucherTitle,
+        _state.newVoucherDescription,
+      );
+
+      _state.createVoucherSuccess();
+
+      return voucher;
+    } catch (e) {
+      _state.createVoucherError();
+    }
+
+    return null;
   }
 }

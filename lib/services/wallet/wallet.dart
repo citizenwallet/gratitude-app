@@ -142,6 +142,7 @@ class WalletService {
   // StationService? _station;
   late APIService _api;
   final APIService _ipfs = APIService(baseURL: dotenv.get('IPFS_URL'));
+  final APIService _station = APIService(baseURL: dotenv.get('STATION_URL'));
 
   late Vouchers vouchers;
 
@@ -204,6 +205,7 @@ class WalletService {
 
     _address = creds.privateKey.address;
     _credentials = creds.privateKey;
+    _publicKey = creds.privateKey.encodedPublicKey;
 
     // _wallet = wallet;
   }
@@ -468,7 +470,7 @@ class WalletService {
     return null;
   }
 
-  /// return a block for a given blockNumber
+  /// return a voucher for a given contract address and voucher id
   Future<Voucher?> getVoucher(String addr, BigInt voucherId) async {
     try {
       final uri = await vouchers.getUri(addr, voucherId);
@@ -481,6 +483,35 @@ class WalletService {
       print(e);
     }
     ;
+
+    return null;
+  }
+
+  /// create a voucher
+  Future<Voucher?> createVoucher(
+      String minterName, String name, String description) async {
+    try {
+      final voucher = VoucherRequest(
+        minterName: minterName,
+        name: name,
+        description: description,
+        amount: 1,
+      );
+
+      final response = await _station.post(
+          url: '/community/regensunite/voucher',
+          body: voucher.toJson(),
+          headers: <String, String>{
+            'X-Address': address.hex,
+            'X-PubKey': publicKeyHex,
+          });
+
+      print(response);
+      return Voucher.fromJson(response.object);
+    } catch (e) {
+      // error fetching block
+      print(e);
+    }
 
     return null;
   }

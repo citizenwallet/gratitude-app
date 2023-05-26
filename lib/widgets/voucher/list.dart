@@ -1,4 +1,4 @@
-import 'package:citizenwallet/state/vouchers/state.dart';
+import 'package:citizenwallet/services/wallet/models/voucher.dart';
 import 'package:citizenwallet/widgets/voucher/card.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -26,11 +26,12 @@ class VoucherList extends StatelessWidget {
               childCount: 1,
               (context, index) {
                 return VoucherCard(
-                    title: 'new voucher',
-                    address: 'new',
-                    icon: '👻',
-                    color: CupertinoColors.systemGrey4,
-                    onPressed: (_) => onCreate());
+                  title: 'New',
+                  address: 'new',
+                  icon: '➕',
+                  color: CupertinoColors.systemGrey4,
+                  onPressed: (_) => onCreate(),
+                );
               },
             ),
           ),
@@ -41,10 +42,10 @@ class VoucherList extends StatelessWidget {
                 final voucher = vouchers[index];
 
                 return VoucherCard(
-                    key: Key(voucher.address),
-                    title: voucher.title,
-                    address: voucher.address,
-                    icon: voucher.icon,
+                    key: Key(voucher.image),
+                    title: voucher.name,
+                    address: voucher.minterAddress,
+                    icon: voucher.image,
                     onPressed: onPressed);
               },
             ),
