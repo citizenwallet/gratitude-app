@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:smartcontracts/smartcontracts.dart';
 import 'package:web3dart/web3dart.dart';
 

@@ -1,15 +1,10 @@
-import 'package:citizenwallet/services/preferences/preferences.dart';
 import 'package:citizenwallet/services/wallet/utils.dart';
-import 'package:citizenwallet/state/account/logic.dart';
 import 'package:citizenwallet/state/profile/logic.dart';
-import 'package:citizenwallet/state/profile/state.dart';
 import 'package:citizenwallet/state/voucher/logic.dart';
 import 'package:citizenwallet/state/voucher/state.dart';
 import 'package:citizenwallet/theme/colors.dart';
 import 'package:citizenwallet/widgets/button.dart';
 import 'package:citizenwallet/widgets/chip.dart';
-import 'package:citizenwallet/widgets/profile_icon/icon.dart';
-import 'package:citizenwallet/widgets/profile_icon/picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -35,7 +30,6 @@ class VoucherScreenState extends State<VoucherScreen>
     with TickerProviderStateMixin {
   final FocusNode descriptionFocusNode = FocusNode();
 
-  final PreferencesService _prefs = PreferencesService();
   late ProfileLogic _logic;
   late VoucherLogic _voucherLogic;
 

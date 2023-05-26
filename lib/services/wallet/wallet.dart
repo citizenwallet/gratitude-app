@@ -12,9 +12,6 @@ import 'package:citizenwallet/services/wallet/models/transaction.dart';
 import 'package:citizenwallet/services/wallet/models/voucher.dart';
 import 'package:citizenwallet/services/wallet/utils.dart';
 import 'package:citizenwallet/services/wallet/vouchers.dart';
-import 'package:citizenwallet/utils/uint8.dart';
-import 'package:crypto/crypto.dart';
-import 'package:cryptography/cryptography.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart';
@@ -254,7 +251,7 @@ class WalletService {
     // _clientVersion = await _ethClient.getClientVersion();
     _chainId = await _ethClient.getChainId();
 
-    final stationUrl = dotenv.get('DEFAULT_STATION_URL');
+    // final stationUrl = dotenv.get('DEFAULT_STATION_URL');
 
     vouchers = await newVouchers(chainId, _ethClient);
 
@@ -553,15 +550,15 @@ class WalletService {
     String? walletFile,
     String? password,
   }) async {
-    final data = {
-      'tx': await _signTransaction(
-        to: to,
-        amount: amount,
-        message: message,
-        walletFile: walletFile,
-        password: password,
-      ),
-    };
+    // final data = {
+    //   'tx': await _signTransaction(
+    //     to: to,
+    //     amount: amount,
+    //     message: message,
+    //     walletFile: walletFile,
+    //     password: password,
+    //   ),
+    // };
 
     // final response = await _station!.transaction(
     //   jsonEncode(data),
