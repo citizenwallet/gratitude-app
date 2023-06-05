@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:web3dart/crypto.dart';
 import 'package:web3dart/web3dart.dart';
+import 'package:web3dart/crypto.dart';
 
 const String zeroAddress = '0x0000000000000000000000000000000000000000';
 final BigInt defaultCallGasLimit = BigInt.from(35000);
@@ -94,47 +95,49 @@ class UserOp {
   }
 
   // getUserOpHash returns the hash of the user op
-  String getUserOpHash(String entrypoint, String chainId) {
-    final buffer = StringBuffer();
+  Uint8List getUserOpHash(String entrypoint, String chainId) {
+    final List<Uint8List> buffer = [];
 
-    buffer.write(sender);
-    buffer.write(bytesToHex(encodeUint256(nonce)));
-    buffer.write(bytesToHex(encodeBytes32(keccak256(initCode))));
-    buffer.write(bytesToHex(encodeBytes32(keccak256(callData))));
-    buffer.write(bytesToHex(encodeUint256(callGasLimit)));
-    buffer.write(bytesToHex(encodeUint256(verificationGasLimit)));
-    buffer.write(bytesToHex(encodeUint256(preVerificationGas)));
-    buffer.write(bytesToHex(encodeUint256(maxFeePerGas)));
-    buffer.write(bytesToHex(encodeUint256(maxPriorityFeePerGas)));
-    buffer.write(bytesToHex(encodeBytes32(keccak256(paymasterAndData))));
+    buffer.add(hexToBytes(sender));
+    buffer.add(encodeUint256(nonce));
+    buffer.add(encodeBytes32(keccak256(initCode)));
+    buffer.add(encodeBytes32(keccak256(callData)));
+    buffer.add(encodeUint256(callGasLimit));
+    buffer.add(encodeUint256(verificationGasLimit));
+    buffer.add(encodeUint256(preVerificationGas));
+    buffer.add(encodeUint256(maxFeePerGas));
+    buffer.add(encodeUint256(maxPriorityFeePerGas));
+    buffer.add(encodeBytes32(keccak256(paymasterAndData)));
 
-    final packed = convertStringToUint8List(buffer.toString());
+    final packed = Uint8List.fromList(buffer
+        .fold([], (previousValue, element) => previousValue..addAll(element)));
 
-    final buffer1 = StringBuffer();
+    final List<Uint8List> buffer1 = [];
 
-    buffer1.write(bytesToHex(encodeBytes32(keccak256(packed))));
-    buffer1.write(entrypoint);
-    buffer1.write(bytesToHex(encodeUint256(BigInt.parse(chainId))));
+    buffer1.add(encodeBytes32(keccak256(packed)));
+    buffer1.add(hexToBytes(entrypoint));
+    buffer1.add(encodeUint256(BigInt.parse(chainId)));
 
-    final encoded = convertStringToUint8List(buffer1.toString());
+    final encoded = Uint8List.fromList(buffer1
+        .fold([], (previousValue, element) => previousValue..addAll(element)));
 
-    return bytesToHex(keccak256(encoded), include0x: true);
+    return keccak256(encoded);
   }
 
   // sign signs the user op
-  void sign(EthPrivateKey credentials, String entrypoint, int chainId) {
+  void generateSignature(
+      EthPrivateKey credentials, String entrypoint, int chainId) {
     final hash = getUserOpHash(
       entrypoint,
       chainId.toString(),
     );
 
-    final signature = credentials.signToEcSignature(
-      hexToBytes(hash),
-      chainId: chainId,
-      isEIP1559: true,
+    final signature = sign(
+      hash,
+      credentials.privateKey,
     );
 
-    //     // encode the signature
+    // encode the signature
     final r = signature.r.toRadixString(16).padLeft(64, '0');
     final s = signature.s.toRadixString(16).padLeft(64, '0');
     final v = bytesToHex(intToBytes(BigInt.from(signature.v + 4)));
@@ -145,6 +148,6 @@ class UserOp {
     // r - 32 bytes
     // s - 32 bytes
 
-    this.signature = convertStringToUint8List('$r$s$v');
+    this.signature = hexToBytes('0x$r$s$v');
   }
 }

@@ -685,7 +685,7 @@ class WalletService {
       userop.verificationGasLimit = paymasterData.verificationGasLimit;
       userop.callGasLimit = paymasterData.callGasLimit;
 
-      userop.sign(credentials, entrypoint, chainId);
+      userop.generateSignature(credentials, entrypoint, chainId);
 
       final oprequest = {
         'sender': sender,

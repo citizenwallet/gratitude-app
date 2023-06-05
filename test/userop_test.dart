@@ -10,6 +10,7 @@ import 'package:citizenwallet/utils/uint8.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:web3dart/crypto.dart';
+import 'package:web3dart/web3dart.dart';
 
 void main() {
   dotenv.load(fileName: '.env');
@@ -34,8 +35,8 @@ void main() {
             '0x199eeba2a9216ed01f9caded6d1b585fc6b0982a73a85f665081fe17a54a24256176fee7747a58b0b2d7db627f705bcd7e7dd0ede7636372985621c8668637b61b'
       };
 
-      final expectedHash =
-          '0xe3031164f5911c9f9d66db02a5e76b01b093365295b649eb8faa78ffd85c68ce';
+      final expectedSig =
+          '0x199eeba2a9216ed01f9caded6d1b585fc6b0982a73a85f665081fe17a54a24256176fee7747a58b0b2d7db627f705bcd7e7dd0ede7636372985621c8668637b61b';
 
       final userop = UserOp.fromJson(useropjson);
 
@@ -70,13 +71,16 @@ void main() {
               useropjson['paymasterAndData'],
           true);
 
-      final hash =
-          userop.getUserOpHash(dotenv.get('ERC4337_ENTRYPOINT'), '80001');
+      final cred =
+          EthPrivateKey.fromHex(dotenv.get('ERC4337_TEST_SIGNING_KEY'));
+      userop.generateSignature(cred, dotenv.get('ERC4337_ENTRYPOINT'), 80001);
 
-      print('expected: $expectedHash');
-      print('actual: $hash');
+      final sig = bytesToHex(userop.signature, include0x: true);
 
-      expect(hash == expectedHash, true);
+      print('expected: $expectedSig');
+      print('actual: $sig');
+
+      expect(sig == expectedSig, true);
     });
   });
 }
