@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:citizenwallet/services/encrypted_preferences/encrypted_preferences.dart';
 import 'package:citizenwallet/services/preferences/preferences.dart';
+import 'package:citizenwallet/services/wallet/derc20.dart';
 import 'package:citizenwallet/services/wallet/wallet.dart';
 import 'package:citizenwallet/state/account/state.dart';
 import 'package:citizenwallet/utils/delay.dart';
@@ -87,6 +88,26 @@ class AccountLogic {
       _state.wallet = loadedWallet;
 
       await _state.wallet.initUnlocked();
+
+      // await _state.wallet.submitUserOp(dotenv.get('ADMIN1'), '10000', 'hello');
+      // await _state.wallet.submitUserOp(
+      //   '0xba6926ae40f93b9c59bceb4be81369031bad857c',
+      //   '0x664ce0F7785E4bA5Ff422C77314eF982F193BeF5',
+      //   '1',
+      //   'hello',
+      // );
+      // await _state.wallet
+      //     .createAccount(); // 0x0c16630ac34964A7Bfe86C202451f78bc1087Ae7
+      // await _state.wallet.getDerc20Balance(dotenv.get('TEST_TOKEN_ADDRESS'),
+      //     '0x0c16630ac34964A7Bfe86C202451f78bc1087Ae7'); // 0x0c16630ac34964A7Bfe86C202451f78bc1087Ae7
+      await _state.wallet.transferDerc20(
+          dotenv.get('ERC4337_ENTRYPOINT'),
+          dotenv.get('TEST_TOKEN_ADDRESS'),
+          '0x0c16630ac34964A7Bfe86C202451f78bc1087Ae7',
+          '0x664ce0F7785E4bA5Ff422C77314eF982F193BeF5',
+          BigInt.one);
+      // await _state.wallet.createProfile(
+      //     '0xEB1FE442FF84305526EDc51ecA080f87575a0fdf'); // 0x3cd07a1FF5EFD26612C6e5CE5D30a54DAfb5c13e
 
       _state.addressSuccess(address);
     } on ConfigErrorException {

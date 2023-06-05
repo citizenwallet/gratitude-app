@@ -729,8 +729,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "v0.0.28"
-      resolved-ref: be023dee07b84b1b97f095b5bcac6dee9b8b8b5a
+      ref: "v0.0.42"
+      resolved-ref: af634fe417c1b1e42271c343e2d28b0c30288f43
       url: "https://github.com/daobrussels/smartcontracts.git"
     source: git
     version: "1.0.0"

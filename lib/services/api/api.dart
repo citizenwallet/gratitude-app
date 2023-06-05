@@ -16,13 +16,18 @@ class APIService {
 
   APIService({required this.baseURL});
 
-  Future<dynamic> get({String? url}) async {
-    final response = await http.get(
-      Uri.parse('$baseURL${url ?? ''}'),
-      headers: <String, String>{
-        // 'Content-Type': 'application/json; charset=UTF-8',
-      },
-    ).timeout(const Duration(seconds: netTimeoutSeconds));
+  Future<dynamic> get({String? url, Map<String, String>? headers}) async {
+    final mergedHeaders = <String, String>{};
+    if (headers != null) {
+      mergedHeaders.addAll(headers);
+    }
+
+    final response = await http
+        .get(
+          Uri.parse('$baseURL${url ?? ''}'),
+          headers: mergedHeaders,
+        )
+        .timeout(const Duration(seconds: netTimeoutSeconds));
 
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw Exception('error fetching data');
@@ -49,6 +54,7 @@ class APIService {
         .timeout(const Duration(seconds: netTimeoutSeconds));
 
     if (response.statusCode < 200 || response.statusCode >= 300) {
+      print(response.statusCode);
       throw Exception('error sending data');
     }
 

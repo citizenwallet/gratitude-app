@@ -18,6 +18,12 @@ BigInt parseIntFromHex(String hex) {
   return BigInt.parse(hex);
 }
 
+String bigIntToHex(BigInt value) {
+  final hex = value.toRadixString(16);
+
+  return '0x$hex';
+}
+
 const zeroHexValue = '0x0';
 const hexPadding = '0x';
 

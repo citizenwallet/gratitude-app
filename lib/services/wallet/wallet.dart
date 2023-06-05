@@ -3,15 +3,20 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:citizenwallet/services/api/api.dart';
+import 'package:citizenwallet/services/wallet/derc20.dart';
 import 'package:citizenwallet/services/wallet/models/block.dart';
 import 'package:citizenwallet/services/wallet/models/chain.dart';
 import 'package:citizenwallet/services/wallet/models/json_rpc.dart';
 import 'package:citizenwallet/services/wallet/models/message.dart';
+import 'package:citizenwallet/services/wallet/models/paymaster_data.dart';
 import 'package:citizenwallet/services/wallet/models/signer.dart';
 import 'package:citizenwallet/services/wallet/models/transaction.dart';
 import 'package:citizenwallet/services/wallet/models/voucher.dart';
+import 'package:citizenwallet/services/wallet/models/userop.dart';
+import 'package:citizenwallet/services/wallet/simple_account.dart';
 import 'package:citizenwallet/services/wallet/utils.dart';
 import 'package:citizenwallet/services/wallet/vouchers.dart';
+import 'package:citizenwallet/utils/uint8.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart';
@@ -516,6 +521,198 @@ class WalletService {
     return null;
   }
 
+  /// submit a user op
+  Future<Voucher?> submitUserOp(
+      String sender, String to, String amount, String message) async {
+    try {
+      final tx = await _signTransaction(
+        to: to,
+        amount: amount,
+        message: message,
+      );
+
+      final body = {
+        'sender': sender,
+        'data': '0x$tx',
+      };
+
+      final response = await _station
+          .post(url: '/community/op', body: body, headers: <String, String>{
+        'X-Address': address.hex,
+        'X-PubKey': publicKeyHex,
+      });
+
+      print(response);
+      return null;
+    } catch (e) {
+      // error fetching block
+      print(e);
+    }
+
+    return null;
+  }
+
+  /// submit a user op
+  Future<Voucher?> createAccount() async {
+    try {
+      final response = await _station.post(
+          url: '/community/account',
+          body: '{}',
+          headers: <String, String>{
+            'X-Address': address.hex,
+            'X-PubKey': publicKeyHex,
+          });
+
+      print(response);
+      return null;
+    } catch (e) {
+      // error fetching block
+      print(e);
+    }
+
+    return null;
+  }
+
+  /// submit a user op
+  Future<Voucher?> createProfile(String id) async {
+    try {
+      final response = await _station.post(
+          url: '/community/account/$id/profile',
+          body: '{}',
+          headers: <String, String>{
+            'X-Address': address.hex,
+            'X-PubKey': publicKeyHex,
+          });
+
+      print(response);
+      return null;
+    } catch (e) {
+      // error fetching block
+      print(e);
+    }
+
+    return null;
+  }
+
+  /// submit a user op
+  Future<Voucher?> getDerc20Balance(String addr, String owner) async {
+    try {
+      final derc20 = await newTestToken(chainId, _ethClient, addr);
+
+      final response = await derc20.getBalance(owner);
+
+      // final response = await _station.get(
+      //     url: '/community/account/$id/derc20/balance',
+      //     headers: <String, String>{
+      //       'X-Address': address.hex,
+      //       'X-PubKey': publicKeyHex,
+      //     });
+
+      print(response.toString());
+      return null;
+    } catch (e) {
+      // error fetching block
+      print(e);
+    }
+
+    return null;
+  }
+
+  /// submit a user op
+  Future<Voucher?> transferDerc20(String entrypoint, String addr, String sender,
+      String to, BigInt amount) async {
+    try {
+      final derc20 = await newTestToken(chainId, _ethClient, addr);
+
+      await derc20.init();
+
+      final simpleAccount = await newSimpleAccount(chainId, _ethClient, sender);
+
+      await simpleAccount.init();
+
+      final credentials = unlock();
+      if (credentials == null) {
+        throw lockedWalletException;
+      }
+
+      final userop = UserOp.defaultUserOp();
+
+      userop.sender = sender;
+      userop.callData = simpleAccount.executeCallData(
+          to, BigInt.zero, derc20.transferCallData(to, amount));
+
+      // final hash = userop.getUserOpHash(entrypoint, chainId.toString());
+
+      // final signature = credentials.signToEcSignature(hexToBytes(hash),
+      //     chainId: chainId, isEIP1559: true);
+
+      // //     // encode the signature
+      // final r = signature.r.toRadixString(16).padLeft(64, '0');
+      // final s = signature.s.toRadixString(16).padLeft(64, '0');
+      // final v = bytesToHex(intToBytes(BigInt.from(signature.v + 4)));
+
+      // // compact the signature
+      // // 0x - padding
+      // // v - 1 byte
+      // // r - 32 bytes
+      // // s - 32 bytes
+
+      // userop.signature = convertStringToUint8List('$r$s$v');
+
+      final soprequest = {
+        'sender': sender,
+        'op': jsonEncode(userop.toJson()),
+      };
+
+      print(jsonEncode(soprequest));
+
+      final response = await _station.post(
+          url: '/community/op/sponsor',
+          body: soprequest,
+          headers: <String, String>{
+            'X-Address': address.hex,
+            'X-PubKey': publicKeyHex,
+          });
+
+      print('paymaster:');
+      print(response['object']);
+
+      final paymasterData = PaymasterData.fromJson(response['object']);
+
+      userop.nonce = paymasterData.nextNonce;
+      userop.paymasterAndData = paymasterData.paymasterAndData;
+      userop.preVerificationGas = paymasterData.preVerificationGas;
+      userop.verificationGasLimit = paymasterData.verificationGasLimit;
+      userop.callGasLimit = paymasterData.callGasLimit;
+
+      userop.sign(credentials, entrypoint, chainId);
+
+      final oprequest = {
+        'sender': sender,
+        'op': jsonEncode(userop.toJson()),
+      };
+
+      print('oprequest:');
+      print(oprequest['op']);
+
+      final opresponse = await _station.post(
+          url: '/community/op/submit',
+          body: oprequest,
+          headers: <String, String>{
+            'X-Address': address.hex,
+            'X-PubKey': publicKeyHex,
+          });
+
+      print('success!');
+      return null;
+    } catch (e) {
+      // error fetching block
+      print(e);
+    }
+
+    return null;
+  }
+
   /// get station config
   Future<Chain?> configStation(String url, EthPrivateKey privatekey) async {
     try {
@@ -562,6 +759,7 @@ class WalletService {
       from: credentials.address,
       value: EtherAmount.fromBigInt(EtherUnit.gwei, parsedAmount),
       data: Message(message: message).toBytes(),
+      maxGas: 42000,
     );
 
     final tx = await _ethClient.signTransaction(

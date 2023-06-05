@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:smartcontracts/smartcontracts.dart';
+// import 'package:smartcontracts/smartcontracts.dart';
 import 'package:web3dart/web3dart.dart';
 
 Future<Vouchers> newVouchers(int chainId, Web3Client client) async {
@@ -11,19 +11,20 @@ class Vouchers {
   final int chainId;
   final Web3Client client;
 
-  StreamSubscription<TransferSingle>? _sub;
+  // StreamSubscription<TransferSingle>? _sub;
 
   Vouchers(this.chainId, this.client);
 
   Future<String> getUri(String addr, BigInt tokenId) async {
-    final contract = RegensUniteTokens(
-      address: EthereumAddress.fromHex(addr),
-      client: client,
-      chainId: chainId,
-    );
+    // final contract = RegensUniteTokens(
+    //   address: EthereumAddress.fromHex(addr),
+    //   client: client,
+    //   chainId: chainId,
+    // );
 
-    final uri = await contract.uri(tokenId);
-    return '/$uri';
+    // final uri = await contract.uri(tokenId);
+    // return '/$uri';
+    return '';
   }
 
   Future<void> getVoucher() async {
@@ -43,6 +44,6 @@ class Vouchers {
   }
 
   void dispose() {
-    _sub?.cancel();
+    // _sub?.cancel();
   }
 }
