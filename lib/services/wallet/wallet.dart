@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:citizenwallet/services/api/api.dart';
 import 'package:citizenwallet/services/wallet/derc20.dart';
+import 'package:citizenwallet/services/wallet/entrypoint.dart';
 import 'package:citizenwallet/services/wallet/models/block.dart';
 import 'package:citizenwallet/services/wallet/models/chain.dart';
 import 'package:citizenwallet/services/wallet/models/json_rpc.dart';
@@ -14,6 +15,7 @@ import 'package:citizenwallet/services/wallet/models/transaction.dart';
 import 'package:citizenwallet/services/wallet/models/voucher.dart';
 import 'package:citizenwallet/services/wallet/models/userop.dart';
 import 'package:citizenwallet/services/wallet/simple_account.dart';
+import 'package:citizenwallet/services/wallet/simple_account_factory.dart';
 import 'package:citizenwallet/services/wallet/utils.dart';
 import 'package:citizenwallet/services/wallet/vouchers.dart';
 import 'package:citizenwallet/utils/uint8.dart';
@@ -139,7 +141,13 @@ class WalletService {
   // Wallet? _wallet;
   EthPrivateKey? _credentials;
   late EthereumAddress _address;
+  late EthereumAddress _account;
   Uint8List? _publicKey;
+
+  late StackupEntryPoint _contractEntryPoint;
+  late AccountFactory _contractAccountFactory;
+  late Token _contractToken;
+  late SimpleAccount _contractAccount;
 
   final Client _client = Client();
 
@@ -148,6 +156,10 @@ class WalletService {
   late APIService _api;
   final APIService _ipfs = APIService(baseURL: dotenv.get('IPFS_URL'));
   final APIService _station = APIService(baseURL: dotenv.get('STATION_URL'));
+  final APIService _bundlerRPC = APIService(baseURL: dotenv.get('RPC_URL'));
+  final APIService _paymasterRPC =
+      APIService(baseURL: dotenv.get('PAYMASTER_RPC_URL'));
+  final String _paymasterType = dotenv.get('PAYMASTER_TYPE');
 
   late Vouchers vouchers;
 
@@ -249,16 +261,22 @@ class WalletService {
     _address = signer.privateKey.address;
   }
 
-  Future<void> init() async {
+  Future<void> init(String eaddr, String afaddr, String taddr) async {
     // _clientVersion = await _ethClient.getClientVersion();
     _chainId = await _ethClient.getChainId();
+
+    await initContracts(eaddr, afaddr, taddr);
   }
 
-  Future<void> initUnlocked() async {
+  Future<void> initUnlocked(String eaddr, String afaddr, String taddr) async {
     // _clientVersion = await _ethClient.getClientVersion();
     _chainId = await _ethClient.getChainId();
 
     // final stationUrl = dotenv.get('DEFAULT_STATION_URL');
+    _account =
+        EthereumAddress.fromHex('0x0c16630ac34964A7Bfe86C202451f78bc1087Ae7');
+
+    await initContracts(eaddr, afaddr, taddr);
 
     vouchers = await newVouchers(chainId, _ethClient);
 
@@ -266,6 +284,17 @@ class WalletService {
 
     // _getAllVouchers();
     // await configStation(stationUrl, _credentials!);
+  }
+
+  Future<void> initContracts(String eaddr, String afaddr, String taddr) async {
+    _contractEntryPoint = newEntryPoint(chainId, _ethClient, eaddr);
+    await _contractEntryPoint.init();
+    _contractAccountFactory = newAccountFactory(chainId, _ethClient, afaddr);
+    await _contractAccountFactory.init();
+    _contractToken = newToken(chainId, _ethClient, taddr);
+    await _contractToken.init();
+    _contractAccount = newSimpleAccount(chainId, _ethClient, _account.hex);
+    await _contractAccount.init();
   }
 
   EthPrivateKey? unlock({String? walletFile, String? password}) {
@@ -292,7 +321,8 @@ class WalletService {
     return null;
   }
 
-  Future<void> switchChain(Chain chain) {
+  Future<void> switchChain(
+      Chain chain, String eaddr, String afaddr, String taddr) {
     dispose();
 
     _chain = chain;
@@ -302,7 +332,9 @@ class WalletService {
     _ethClient = Web3Client(url, _client);
     _api = APIService(baseURL: url);
 
-    return _credentials != null ? initUnlocked() : init();
+    return _credentials != null
+        ? initUnlocked(eaddr, afaddr, taddr)
+        : init(eaddr, afaddr, taddr);
   }
 
   Future<Chain?> fetchChainById(BigInt id) async {
@@ -335,6 +367,33 @@ class WalletService {
     final rawRespoonse = await _api.post(body: body);
 
     final response = JSONRPCResponse.fromJson(rawRespoonse);
+
+    if (response.error != null) {
+      throw Exception(response.error!.message);
+    }
+
+    return response;
+  }
+
+  /// makes a jsonrpc request from this wallet
+  Future<SUJSONRPCResponse> _requestBundler(SUJSONRPCRequest body) async {
+    final rawRespoonse = await _bundlerRPC.post(body: body);
+
+    final response = SUJSONRPCResponse.fromJson(rawRespoonse);
+
+    if (response.error != null) {
+      throw Exception(response.error!.message);
+    }
+
+    return response;
+  }
+
+  /// makes a jsonrpc request from this wallet
+  Future<SUJSONRPCResponse> _requestPaymaster(SUJSONRPCRequest body) async {
+    print(jsonEncode(body.toJson()));
+    final rawRespoonse = await _paymasterRPC.post(body: body);
+
+    final response = SUJSONRPCResponse.fromJson(rawRespoonse);
 
     if (response.error != null) {
       throw Exception(response.error!.message);
@@ -433,6 +492,25 @@ class WalletService {
 
   /// allows you to listen to new blocks
   Stream<String> get blockStream => _ethClient.addedBlocks();
+
+  /// return maxPriorityFeePerGas
+  Future<BigInt?> _getMaxPriorityFeePerGas() async {
+    final body = JSONRPCRequest(
+      method: 'eth_maxPriorityFeePerGas',
+      params: [],
+    );
+
+    try {
+      final response = await _request(body);
+
+      return hexToInt(response.result);
+    } catch (e) {
+      // error fetching block
+      print(e);
+    }
+
+    return null;
+  }
 
   /// return a block for a given blockNumber
   Future<WalletBlock?> _getBlockByNumber({int? blockNumber}) async {
@@ -553,7 +631,7 @@ class WalletService {
   }
 
   /// submit a user op
-  Future<Voucher?> createAccount() async {
+  Future<String?> createAccount() async {
     try {
       final response = await _station.post(
           url: '/community/account',
@@ -563,8 +641,9 @@ class WalletService {
             'X-PubKey': publicKeyHex,
           });
 
-      print(response);
-      return null;
+      _account = EthereumAddress.fromHex(response['object']['address']);
+
+      return response['object']['address'];
     } catch (e) {
       // error fetching block
       print(e);
@@ -595,11 +674,9 @@ class WalletService {
   }
 
   /// submit a user op
-  Future<Voucher?> getDerc20Balance(String addr, String owner) async {
+  Future<Voucher?> getDerc20Balance(String owner) async {
     try {
-      final derc20 = await newTestToken(chainId, _ethClient, addr);
-
-      final response = await derc20.getBalance(owner);
+      final response = await _contractToken.getBalance(owner);
 
       // final response = await _station.get(
       //     url: '/community/account/$id/derc20/balance',
@@ -618,18 +695,66 @@ class WalletService {
     return null;
   }
 
-  /// submit a user op
-  Future<Voucher?> transferDerc20(String entrypoint, String addr, String sender,
-      String to, BigInt amount) async {
+  Future<bool> needsAccountDeployment() async {
+    final nonce = await _contractEntryPoint.getNonce(_account.hex);
+
+    return nonce == BigInt.zero;
+  }
+
+  Future<void> derc20TransferListen() async {
+    _contractToken.listen(_account.hex);
+  }
+
+  /// return paymaster data for constructing a user op
+  Future<PaymasterData?> _getPaymasterData(
+    UserOp userop,
+    String eaddr,
+    String ptype,
+  ) async {
+    final body = SUJSONRPCRequest(
+      method: 'pm_sponsorUserOperation',
+      params: [
+        userop.toJson(),
+        eaddr,
+        {'type': ptype},
+      ],
+    );
+
     try {
-      final derc20 = await newTestToken(chainId, _ethClient, addr);
+      final response = await _requestPaymaster(body);
 
-      await derc20.init();
+      return PaymasterData.fromJson(response.result);
+    } catch (e) {
+      // error fetching block
+      print(e);
+    }
 
-      final simpleAccount = await newSimpleAccount(chainId, _ethClient, sender);
+    return null;
+  }
 
-      await simpleAccount.init();
+  /// submit a user op
+  Future<void> _submitUserOp(
+    UserOp userop,
+    String eaddr,
+  ) async {
+    final body = SUJSONRPCRequest(
+      method: 'eth_sendUserOperation',
+      params: [userop.toJson(), eaddr],
+    );
 
+    try {
+      await _requestBundler(body);
+    } catch (e) {
+      // error fetching block
+      print(e);
+    }
+
+    return;
+  }
+
+  /// submit a user op
+  Future<Voucher?> transferDerc20(String to, BigInt amount) async {
+    try {
       final credentials = unlock();
       if (credentials == null) {
         throw lockedWalletException;
@@ -637,58 +762,44 @@ class WalletService {
 
       final userop = UserOp.defaultUserOp();
 
-      userop.sender = sender;
-      userop.callData = simpleAccount.executeCallData(
-        addr,
+      userop.sender = _account.hex;
+      userop.nonce = await _contractEntryPoint.getNonce(_account.hex);
+      userop.callData = _contractAccount.executeCallData(
+        _contractToken.addr,
         BigInt.zero,
-        derc20.transferCallData(to, amount),
+        _contractToken.transferCallData(to, amount),
       );
 
-      final soprequest = {
-        'sender': sender,
-        'op': jsonEncode(userop.toJson()),
-      };
+      // final blockInfo = await getBlock(null);
+      final fees = await _ethClient.getGasInEIP1559();
+      if (fees.isEmpty) {
+        throw Exception('unable to estimate fees');
+      }
 
-      print(jsonEncode(soprequest));
+      final fee = fees.first;
 
-      final response = await _station.post(
-          url: '/community/op/sponsor',
-          body: soprequest,
-          headers: <String, String>{
-            'X-Address': address.hex,
-            'X-PubKey': publicKeyHex,
-          });
+      userop.maxPriorityFeePerGas = fee.maxPriorityFeePerGas;
+      userop.maxFeePerGas = fee.maxFeePerGas;
 
-      print('paymaster:');
-      print(response['object']);
+      final paymasterData = await _getPaymasterData(
+        userop,
+        _contractEntryPoint.addr,
+        _paymasterType,
+      );
 
-      final paymasterData = PaymasterData.fromJson(response['object']);
+      if (paymasterData == null) {
+        throw Exception('paymaster data is null');
+      }
 
-      userop.nonce = paymasterData.nextNonce;
       userop.paymasterAndData = paymasterData.paymasterAndData;
       userop.preVerificationGas = paymasterData.preVerificationGas;
       userop.verificationGasLimit = paymasterData.verificationGasLimit;
       userop.callGasLimit = paymasterData.callGasLimit;
 
-      userop.generateSignature(credentials, entrypoint, chainId);
+      userop.generateSignature(credentials, _contractEntryPoint.addr, chainId);
 
-      final oprequest = {
-        'sender': sender,
-        'op': jsonEncode(userop.toJson()),
-      };
+      await _submitUserOp(userop, _contractEntryPoint.addr);
 
-      print('oprequest:');
-      print(oprequest['op']);
-
-      final opresponse = await _station.post(
-          url: '/community/op/submit',
-          body: oprequest,
-          headers: <String, String>{
-            'X-Address': address.hex,
-            'X-PubKey': publicKeyHex,
-          });
-
-      print('success!');
       return null;
     } catch (e) {
       // error fetching block
@@ -873,6 +984,9 @@ class WalletService {
   /// dispose of resources
   void dispose() {
     vouchers.dispose();
+    _contractToken.dispose();
+    _contractAccountFactory.dispose();
+    _contractEntryPoint.dispose();
     _ethClient.dispose();
   }
 }

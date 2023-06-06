@@ -3,23 +3,23 @@ import 'dart:typed_data';
 import 'package:flutter/services.dart' show rootBundle;
 
 import 'package:smartcontracts/external.dart';
+import 'package:web3dart/crypto.dart';
 import 'package:web3dart/web3dart.dart';
 
-Future<TestToken> newTestToken(
-    int chainId, Web3Client client, String addr) async {
-  return TestToken(chainId, client, addr);
+Token newToken(int chainId, Web3Client client, String addr) {
+  return Token(chainId, client, addr);
 }
 
-class TestToken {
+class Token {
   final int chainId;
   final Web3Client client;
   final String addr;
   late DERC20 contract;
   late DeployedContract rcontract;
 
-  // StreamSubscription<TransferSingle>? _sub;
+  StreamSubscription<FilterEvent>? _sub;
 
-  TestToken(this.chainId, this.client, this.addr) {
+  Token(this.chainId, this.client, this.addr) {
     contract = DERC20(
       address: EthereumAddress.fromHex(addr),
       chainId: chainId,
@@ -52,7 +52,33 @@ class TestToken {
     return function.encodeCall([EthereumAddress.fromHex(to), amount]);
   }
 
+  void listen(String from) async {
+    final ev = rcontract.event('Transfer');
+
+    final filter = FilterOptions(
+      address: rcontract.address,
+      topics: [
+        [
+          bytesToHex(ev.signature, forcePadLength: 64, include0x: true),
+        ],
+        [
+          bytesToHex(hexToBytes(from), forcePadLength: 64, include0x: true),
+        ]
+      ],
+    );
+
+    _sub = client.events(filter).listen((event) {
+      final decoded = ev.decodeResults(event.topics!, event.data!);
+
+      final from = decoded[0] as EthereumAddress;
+      final to = decoded[1] as EthereumAddress;
+      final value = decoded[2] as BigInt;
+
+      print('$from sent $value DERC20 to $to');
+    });
+  }
+
   void dispose() {
-    // _sub?.cancel();
+    _sub?.cancel();
   }
 }

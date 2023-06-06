@@ -39,7 +39,8 @@ class APIService {
   Future<dynamic> post(
       {String? url, required Object body, Map<String, String>? headers}) async {
     final mergedHeaders = <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
     };
     if (headers != null) {
       mergedHeaders.addAll(headers);

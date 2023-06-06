@@ -87,7 +87,20 @@ class AccountLogic {
 
       _state.wallet = loadedWallet;
 
-      await _state.wallet.initUnlocked();
+      await _state.wallet.initUnlocked(
+          dotenv.get('ERC4337_ENTRYPOINT'),
+          dotenv.get('ERC4337_ACCOUNT_FACTORY'),
+          dotenv.get('TEST_TOKEN_ADDRESS'));
+
+      // final needsDeployment = await _state.wallet.needsAccountDeployment();
+
+      // print(needsDeployment);
+      // if (needsDeployment) {
+      //   await _state.wallet.createAccount();
+      // }
+
+      // await _state.wallet
+      //     .derc20TransferListen();
 
       // await _state.wallet.submitUserOp(dotenv.get('ADMIN1'), '10000', 'hello');
       // await _state.wallet.submitUserOp(
@@ -97,17 +110,17 @@ class AccountLogic {
       //   'hello',
       // );
       // await _state.wallet
-      //     .createAccount(); // 0x0c16630ac34964A7Bfe86C202451f78bc1087Ae7
+      //     .createAccount(); // 0x3f4127dd293c272c6d1c66485f9cddda7a211848
       // await _state.wallet.getDerc20Balance(dotenv.get('TEST_TOKEN_ADDRESS'),
       //     '0x0c16630ac34964A7Bfe86C202451f78bc1087Ae7'); // 0x0c16630ac34964A7Bfe86C202451f78bc1087Ae7
       await _state.wallet.transferDerc20(
-          dotenv.get('ERC4337_ENTRYPOINT'),
-          dotenv.get('TEST_TOKEN_ADDRESS'),
-          '0x0c16630ac34964A7Bfe86C202451f78bc1087Ae7',
-          '0x664ce0F7785E4bA5Ff422C77314eF982F193BeF5',
-          BigInt.one);
+        '0x664ce0F7785E4bA5Ff422C77314eF982F193BeF5',
+        BigInt.one,
+      );
       // await _state.wallet.createProfile(
       //     '0xEB1FE442FF84305526EDc51ecA080f87575a0fdf'); // 0x3cd07a1FF5EFD26612C6e5CE5D30a54DAfb5c13e
+
+      print('success!');
 
       _state.addressSuccess(address);
     } on ConfigErrorException {

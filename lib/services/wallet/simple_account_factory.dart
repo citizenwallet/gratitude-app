@@ -5,21 +5,21 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:smartcontracts/external.dart';
 import 'package:web3dart/web3dart.dart';
 
-SimpleAccount newSimpleAccount(int chainId, Web3Client client, String addr) {
-  return SimpleAccount(chainId, client, addr);
+AccountFactory newAccountFactory(int chainId, Web3Client client, String addr) {
+  return AccountFactory(chainId, client, addr);
 }
 
-class SimpleAccount {
+class AccountFactory {
   final int chainId;
   final Web3Client client;
   final String addr;
-  late DERC20 contract;
+  late SimpleAccountFactory contract;
   late DeployedContract rcontract;
 
   // StreamSubscription<TransferSingle>? _sub;
 
-  SimpleAccount(this.chainId, this.client, this.addr) {
-    contract = DERC20(
+  AccountFactory(this.chainId, this.client, this.addr) {
+    contract = SimpleAccountFactory(
       address: EthereumAddress.fromHex(addr),
       chainId: chainId,
       client: client,
@@ -28,21 +28,23 @@ class SimpleAccount {
 
   Future<void> init() async {
     final abi = await rootBundle.loadString(
-        'packages/smartcontracts/contracts/external/SimpleAccount.abi.json');
+        'packages/smartcontracts/contracts/external/SimpleAccountFactory.abi.json');
 
-    final cabi = ContractAbi.fromJson(abi, 'SimpleAccount');
+    final cabi = ContractAbi.fromJson(abi, 'SimpleAccountFactory');
 
     rcontract = DeployedContract(cabi, EthereumAddress.fromHex(addr));
   }
 
-  Future<BigInt> getBalance(String addr) async {
-    final balance = await contract.balanceOf(EthereumAddress.fromHex(addr));
+  Future<String> createAccount(EthPrivateKey cred, String addr) async {
+    final account = await contract.createAccount(
+        EthereumAddress.fromHex(addr), BigInt.from(0),
+        credentials: cred);
 
-    print(balance.toString());
+    print(account.toString());
 
     // final uri = await contract.uri(tokenId);
     // return '/$uri';
-    return balance;
+    return account;
   }
 
   Uint8List executeCallData(String dest, BigInt amount, Uint8List calldata) {
