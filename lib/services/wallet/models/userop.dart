@@ -5,6 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:web3dart/crypto.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:web3dart/crypto.dart';
+import 'package:web3dart/src/utils/length_tracking_byte_sink.dart';
 
 const String zeroAddress = '0x0000000000000000000000000000000000000000';
 final BigInt defaultCallGasLimit = BigInt.from(35000);
@@ -96,32 +97,57 @@ class UserOp {
 
   // getUserOpHash returns the hash of the user op
   Uint8List getUserOpHash(String entrypoint, String chainId) {
-    final List<Uint8List> buffer = [];
+    final packed = LengthTrackingByteSink();
 
-    buffer.add(hexToBytes(sender));
-    buffer.add(encodeUint256(nonce));
-    buffer.add(encodeBytes32(keccak256(initCode)));
-    buffer.add(encodeBytes32(keccak256(callData)));
-    buffer.add(encodeUint256(callGasLimit));
-    buffer.add(encodeUint256(verificationGasLimit));
-    buffer.add(encodeUint256(preVerificationGas));
-    buffer.add(encodeUint256(maxFeePerGas));
-    buffer.add(encodeUint256(maxPriorityFeePerGas));
-    buffer.add(encodeBytes32(keccak256(paymasterAndData)));
+    final List<AbiType> encoders = [
+      parseAbiType('address'),
+      parseAbiType('uint256'),
+      parseAbiType('bytes32'),
+      parseAbiType('bytes32'),
+      parseAbiType('uint256'),
+      parseAbiType('uint256'),
+      parseAbiType('uint256'),
+      parseAbiType('uint256'),
+      parseAbiType('uint256'),
+      parseAbiType('bytes32'),
+    ];
 
-    final packed = Uint8List.fromList(buffer
-        .fold([], (previousValue, element) => previousValue..addAll(element)));
+    final List<dynamic> values = [
+      EthereumAddress.fromHex(sender),
+      nonce,
+      keccak256(initCode),
+      keccak256(callData),
+      callGasLimit,
+      verificationGasLimit,
+      preVerificationGas,
+      maxFeePerGas,
+      maxPriorityFeePerGas,
+      keccak256(paymasterAndData),
+    ];
 
-    final List<Uint8List> buffer1 = [];
+    for (var i = 0; i < encoders.length; i++) {
+      encoders[i].encode(values[i], packed);
+    }
 
-    buffer1.add(encodeBytes32(keccak256(packed)));
-    buffer1.add(hexToBytes(entrypoint));
-    buffer1.add(encodeUint256(BigInt.parse(chainId)));
+    final enc = LengthTrackingByteSink();
 
-    final encoded = Uint8List.fromList(buffer1
-        .fold([], (previousValue, element) => previousValue..addAll(element)));
+    final List<AbiType> encoders1 = [
+      parseAbiType('bytes32'),
+      parseAbiType('address'),
+      parseAbiType('uint256'),
+    ];
 
-    return keccak256(encoded);
+    final List<dynamic> values1 = [
+      keccak256(packed.asBytes()),
+      EthereumAddress.fromHex(entrypoint),
+      BigInt.parse(chainId),
+    ];
+
+    for (var i = 0; i < encoders1.length; i++) {
+      encoders1[i].encode(values1[i], enc);
+    }
+
+    return keccak256(enc.asBytes());
   }
 
   // sign signs the user op
@@ -132,22 +158,10 @@ class UserOp {
       chainId.toString(),
     );
 
-    final signature = sign(
+    final signature = credentials.signPersonalMessageToUint8List(
       hash,
-      credentials.privateKey,
     );
 
-    // encode the signature
-    final r = signature.r.toRadixString(16).padLeft(64, '0');
-    final s = signature.s.toRadixString(16).padLeft(64, '0');
-    final v = bytesToHex(intToBytes(BigInt.from(signature.v + 4)));
-
-    // compact the signature
-    // 0x - padding
-    // v - 1 byte
-    // r - 32 bytes
-    // s - 32 bytes
-
-    this.signature = hexToBytes('0x$r$s$v');
+    this.signature = signature;
   }
 }

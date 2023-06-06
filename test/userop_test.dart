@@ -35,6 +35,8 @@ void main() {
             '0x199eeba2a9216ed01f9caded6d1b585fc6b0982a73a85f665081fe17a54a24256176fee7747a58b0b2d7db627f705bcd7e7dd0ede7636372985621c8668637b61b'
       };
 
+      final expectedHash =
+          '0xe3031164f5911c9f9d66db02a5e76b01b093365295b649eb8faa78ffd85c68ce';
       final expectedSig =
           '0x199eeba2a9216ed01f9caded6d1b585fc6b0982a73a85f665081fe17a54a24256176fee7747a58b0b2d7db627f705bcd7e7dd0ede7636372985621c8668637b61b';
 
@@ -75,10 +77,21 @@ void main() {
           EthPrivateKey.fromHex(dotenv.get('ERC4337_TEST_SIGNING_KEY'));
       userop.generateSignature(cred, dotenv.get('ERC4337_ENTRYPOINT'), 80001);
 
+      final hash = bytesToHex(
+          userop.getUserOpHash(dotenv.get('ERC4337_ENTRYPOINT'), '80001'),
+          include0x: true);
+
+      print('expected: $expectedHash');
+      print('actual: $hash');
+
+      expect(hash == expectedHash, true);
+
       final sig = bytesToHex(userop.signature, include0x: true);
 
       print('expected: $expectedSig');
       print('actual: $sig');
+      print(
+          'old: 0x5da706c09a4f168d21a7075fc14eef9628afed1bff8949581d5902a86e52035c4b886a0ab1f1b160334021cd0f598ff506bb5be368c004d16b9412f917b693a91c');
 
       expect(sig == expectedSig, true);
     });

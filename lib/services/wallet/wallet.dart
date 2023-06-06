@@ -639,25 +639,10 @@ class WalletService {
 
       userop.sender = sender;
       userop.callData = simpleAccount.executeCallData(
-          to, BigInt.zero, derc20.transferCallData(to, amount));
-
-      // final hash = userop.getUserOpHash(entrypoint, chainId.toString());
-
-      // final signature = credentials.signToEcSignature(hexToBytes(hash),
-      //     chainId: chainId, isEIP1559: true);
-
-      // //     // encode the signature
-      // final r = signature.r.toRadixString(16).padLeft(64, '0');
-      // final s = signature.s.toRadixString(16).padLeft(64, '0');
-      // final v = bytesToHex(intToBytes(BigInt.from(signature.v + 4)));
-
-      // // compact the signature
-      // // 0x - padding
-      // // v - 1 byte
-      // // r - 32 bytes
-      // // s - 32 bytes
-
-      // userop.signature = convertStringToUint8List('$r$s$v');
+        addr,
+        BigInt.zero,
+        derc20.transferCallData(to, amount),
+      );
 
       final soprequest = {
         'sender': sender,
