@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/services.dart' show rootBundle;
 
 import 'package:smartcontracts/external.dart';
+import 'package:web3dart/crypto.dart';
 import 'package:web3dart/web3dart.dart';
 
 AccountFactory newAccountFactory(int chainId, Web3Client client, String addr) {
@@ -47,11 +48,17 @@ class AccountFactory {
     return account;
   }
 
-  Uint8List executeCallData(String dest, BigInt amount, Uint8List calldata) {
-    final function = rcontract.function('execute');
+  Future<EthereumAddress> getAddress(String owner) {
+    return contract.getAddress(EthereumAddress.fromHex(owner), BigInt.zero);
+  }
 
-    return function
-        .encodeCall([EthereumAddress.fromHex(dest), amount, calldata]);
+  Uint8List createAccountInitCode(String owner, BigInt amount) {
+    final function = rcontract.function('createAccount');
+
+    final callData =
+        function.encodeCall([EthereumAddress.fromHex(owner), amount]);
+
+    return hexToBytes('$addr${bytesToHex(callData)}');
   }
 
   void dispose() {

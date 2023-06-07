@@ -217,7 +217,7 @@ class WalletService {
   ) {
     final url = _chain!.rpc.first;
 
-    _ethClient = Web3Client(url, _client);
+    _ethClient = Web3Client(dotenv.get('RPC_URL'), _client);
     _api = APIService(baseURL: url);
 
     _address = creds.privateKey.address;
@@ -273,8 +273,6 @@ class WalletService {
     _chainId = await _ethClient.getChainId();
 
     // final stationUrl = dotenv.get('DEFAULT_STATION_URL');
-    _account =
-        EthereumAddress.fromHex('0x0c16630ac34964A7Bfe86C202451f78bc1087Ae7');
 
     await initContracts(eaddr, afaddr, taddr);
 
@@ -289,10 +287,21 @@ class WalletService {
   Future<void> initContracts(String eaddr, String afaddr, String taddr) async {
     _contractEntryPoint = newEntryPoint(chainId, _ethClient, eaddr);
     await _contractEntryPoint.init();
+
     _contractAccountFactory = newAccountFactory(chainId, _ethClient, afaddr);
     await _contractAccountFactory.init();
+
+    final credentials = unlock();
+    if (credentials == null) {
+      throw lockedWalletException;
+    }
+
+    _account =
+        await _contractAccountFactory.getAddress(credentials.address.hex);
+
     _contractToken = newToken(chainId, _ethClient, taddr);
     await _contractToken.init();
+
     _contractAccount = newSimpleAccount(chainId, _ethClient, _account.hex);
     await _contractAccount.init();
   }
@@ -763,7 +772,18 @@ class WalletService {
       final userop = UserOp.defaultUserOp();
 
       userop.sender = _account.hex;
-      userop.nonce = await _contractEntryPoint.getNonce(_account.hex);
+
+      final nonce = await _contractEntryPoint.getNonce(_account.hex);
+
+      if (nonce == BigInt.zero) {
+        // deploy account
+        userop.initCode = _contractAccountFactory.createAccountInitCode(
+          credentials.address.hex,
+          BigInt.zero,
+        );
+      }
+
+      userop.nonce = nonce;
       userop.callData = _contractAccount.executeCallData(
         _contractToken.addr,
         BigInt.zero,

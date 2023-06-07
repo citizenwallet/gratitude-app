@@ -136,6 +136,7 @@ class AccountLogic {
       await loadWallet();
     } catch (e) {
       _state.addressError();
+      print(e);
     }
   }
 }
