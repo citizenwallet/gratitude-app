@@ -115,7 +115,7 @@ class AccountLogic {
       //     '0x0c16630ac34964A7Bfe86C202451f78bc1087Ae7'); // 0x0c16630ac34964A7Bfe86C202451f78bc1087Ae7
       await _state.wallet.transferDerc20(
         '0x664ce0F7785E4bA5Ff422C77314eF982F193BeF5',
-        BigInt.one,
+        BigInt.from(100),
       );
       // await _state.wallet.createProfile(
       //     '0xEB1FE442FF84305526EDc51ecA080f87575a0fdf'); // 0x3cd07a1FF5EFD26612C6e5CE5D30a54DAfb5c13e

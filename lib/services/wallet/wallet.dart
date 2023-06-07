@@ -787,7 +787,10 @@ class WalletService {
       userop.callData = _contractAccount.executeCallData(
         _contractToken.addr,
         BigInt.zero,
-        _contractToken.transferCallData(to, amount),
+        _contractToken.transferCallData(
+          to,
+          EtherAmount.fromBigInt(EtherUnit.finney, amount).getInWei,
+        ),
       );
 
       // final blockInfo = await getBlock(null);
